@@ -1,6 +1,5 @@
 group 'org.training.chat'
 version '1.0-SNAPSHOT'
-mainClassName = 'org.training.chat.MainApp'
 
 apply plugin: 'java'
 
@@ -18,7 +17,7 @@ dependencies {
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Version': version,
-                'Main-Class': mainClassName
+                'Main-Class': 'org.training.chat.MainApp'
     }
     baseName = project.name + '-fat'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
