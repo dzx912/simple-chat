@@ -16,9 +16,10 @@ public class SendMessageHandler implements Handler<Message<String>> {
     }
 
     @Override
-    public void handle(Message<String> event) {
-        String message = event.body();
+    public void handle(Message<String> data) {
+        String message = data.body();
         System.out.println("WebSocket message: " + message);
         webSocket.writeFinalTextFrame("Echo message: " + message);
+        data.reply("ok");
     }
 }

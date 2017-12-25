@@ -19,5 +19,6 @@ public class RouterVerticle extends AbstractVerticle {
         String message = data.body();
         System.out.println("WebSocket message: " + message);
         vertx.eventBus().send(message, "hello + " + message);
+        data.reply("ok");
     }
 }
