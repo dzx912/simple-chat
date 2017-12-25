@@ -1,6 +1,7 @@
 package org.training.chat.verticle;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.json.Json;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -8,8 +9,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.training.chat.data.Message;
+import org.training.chat.data.User;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
+import static org.training.chat.constants.BusEndpoints.TOKEN;
 
 /**
  * Unit test for actor Router
@@ -32,15 +36,20 @@ public class RouterVerticleTest {
     }
 
     @Test
-    public void testSimpleRouter(TestContext context) {
+    public void testRouter(TestContext context) {
         final Async async = context.async();
 
         String text = "checkText";
-        vertx.eventBus().localConsumer(text, receiveResult -> {
-            context.assertEquals("hello + " + text, receiveResult.body());
+        long idMessage = 1L;
+        long idUser = 2L;
+        String tokenUser = String.format(TOKEN.getPath(), idUser);
+        final String jsonRequest = Json.encodePrettily(new Message(idMessage, text, new User(idUser)));
+
+        vertx.eventBus().localConsumer(tokenUser, receiveResult -> {
+            context.assertEquals(jsonRequest, receiveResult.body());
             async.complete();
         });
 
-        vertx.eventBus().send(ROUTER.getPath(), text);
+        vertx.eventBus().send(ROUTER.getPath(), jsonRequest);
     }
 }
