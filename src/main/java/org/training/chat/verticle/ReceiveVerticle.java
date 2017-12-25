@@ -5,11 +5,12 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
-import io.vertx.core.http.WebSocketFrame;
 import org.training.chat.handler.SendMessageHandler;
 
+import static org.training.chat.constants.BusEndpoints.ROUTER;
+
 /**
- * Класс для приема сообщений
+ * Actor для приема сообщений
  */
 public class ReceiveVerticle extends AbstractVerticle {
 
@@ -31,23 +32,12 @@ public class ReceiveVerticle extends AbstractVerticle {
         System.out.println("Create WebSocket server with path: " + path);
 
         // Подключаем обработчик WebSocket сообщений
-        wsServer.frameHandler(this::receiveMessage);
+        wsServer.frameHandler(ws -> eventBus.send(ROUTER.getPath(), ws.textData()));
 
         // Делаем обработчик события, что кто-то хочет написать в этот WebSocket
-        MessageConsumer<String> consumerSendMessage = eventBus.consumer(path, new SendMessageHandler(wsServer));
+        MessageConsumer<String> consumerSendMessage = eventBus.localConsumer(path, new SendMessageHandler(wsServer));
 
         // Снимаем обработчик, после закрытия WebSocket'а
         wsServer.closeHandler(aVoid -> consumerSendMessage.unregister());
-    }
-
-    /**
-     * Обработчик приема WebSocket сообщения
-     *
-     * @param webSocketFrame объект, в котором находится полученное сообщение от клиента
-     */
-    private void receiveMessage(WebSocketFrame webSocketFrame) {
-        String message = webSocketFrame.textData();
-        System.out.println("WebSocket message: " + message);
-        eventBus.send(message, "hello + " + message);
     }
 }
