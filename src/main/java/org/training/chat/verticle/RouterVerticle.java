@@ -21,7 +21,7 @@ public class RouterVerticle extends AbstractVerticle {
         final org.training.chat.data.Message message = Json.decodeValue(data.body(), org.training.chat.data.Message.class);
         System.out.println("WebSocket message.text: " + message.getText());
 
-        String token = String.format(TOKEN.getPath(), message.getAuthor().getId());
+        String token = String.format(TOKEN.getPath(), message.getChat().getId());
 
         vertx.eventBus().send(token, data.body());
 

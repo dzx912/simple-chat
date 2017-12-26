@@ -8,14 +8,16 @@ public class Message {
     private Long id;
     private String text;
     private User author;
+    private Chat chat;
 
     public Message() {
     }
 
-    public Message(Long id, String text, User author) {
+    public Message(Long id, String text, User author, Chat chat) {
         this.id = id;
         this.text = text;
         this.author = author;
+        this.chat = chat;
     }
 
     public Long getId() {
@@ -40,5 +42,13 @@ public class Message {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public Chat getChat() {
+        return chat;
+    }
+
+    public void setChat(Chat chat) {
+        this.chat = chat;
     }
 }

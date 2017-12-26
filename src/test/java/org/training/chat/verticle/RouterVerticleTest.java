@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.training.chat.data.Chat;
 import org.training.chat.data.Message;
 import org.training.chat.data.User;
 
@@ -42,8 +43,14 @@ public class RouterVerticleTest {
         String text = "checkText";
         long idMessage = 1L;
         long idUser = 2L;
-        String tokenUser = String.format(TOKEN.getPath(), idUser);
-        final String jsonRequest = Json.encodePrettily(new Message(idMessage, text, new User(idUser)));
+        long idChat = 3L;
+        String tokenUser = String.format(TOKEN.getPath(), idChat);
+        final String jsonRequest = Json.encodePrettily(
+                new Message(idMessage,
+                        text,
+                        new User(idUser),
+                        new Chat(idChat))
+        );
 
         vertx.eventBus().localConsumer(tokenUser, receiveResult -> {
             context.assertEquals(jsonRequest, receiveResult.body());
