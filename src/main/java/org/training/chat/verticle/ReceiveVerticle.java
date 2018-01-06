@@ -39,6 +39,9 @@ public class ReceiveVerticle extends AbstractVerticle {
         MessageConsumer<String> consumerSendMessage = eventBus.localConsumer(path, new SendMessageHandler(wsServer));
 
         // Снимаем обработчик, после закрытия WebSocket'а
-        wsServer.closeHandler(aVoid -> consumerSendMessage.unregister());
+        wsServer.closeHandler(aVoid -> {
+            consumerSendMessage.unregister();
+            System.out.println("Close connect with: " + path);
+        });
     }
 }

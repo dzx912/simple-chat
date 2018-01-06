@@ -4,17 +4,65 @@ document.addEventListener("DOMContentLoaded", function() {
     var inputTextMessage = document.getElementById("inputMessage");
     var outputTextMessage = document.getElementById("outputMessage");
 
-    var socket = new WebSocket("ws://localhost:8080/token/3");
+    var buttonConnect = document.getElementById("buttonConnect");
+    var inputToken = document.getElementById("inputToken");
+    var receiverToken = document.getElementById("receiverToken");
+
+    var socket;
+    var token;
+    var isConnect;
+
+    buttonConnect.addEventListener("click", onConnect);
 
     buttonSend.addEventListener("click", sendMessage);
-    socket.addEventListener('open', wsConnect);
-    socket.addEventListener('message', wsGetMessage);
-    socket.addEventListener('close', wsClose);
-    socket.addEventListener('error', wsError);
+    inputTextMessage.addEventListener("keypress", onEnterInputTextMessage);
+
+    init();
+
+    function init() {
+        isConnect = false;
+
+        buttonConnect.innerText = "Connect";
+        inputToken.disabled = false;
+
+        buttonSend.disabled = true;
+        receiverToken.disabled = true;
+        inputTextMessage.disabled = true;
+    }
+
+    function holdConnection() {
+        isConnect = true;
+
+        buttonConnect.innerText = "Close";
+        inputToken.disabled = true;
+
+        buttonSend.disabled = false;
+        receiverToken.disabled = false;
+        inputTextMessage.disabled = false;
+    }
+
+    function onConnect() {
+        token = inputToken.value;
+        if(!isConnect) {
+            if(token) {
+                createWsConnect();
+            }
+        } else {
+            socket.close();
+        }
+    }
+
+    function createWsConnect() {
+        socket = new WebSocket("ws://localhost:8080/token/" + token);
+
+        socket.addEventListener('open', wsConnect);
+        socket.addEventListener('message', wsGetMessage);
+        socket.addEventListener('close', wsClose);
+        socket.addEventListener('error', wsError);
+    }
 
     function wsConnect() {
-        console.log("open");
-        buttonSend.disabled = false;
+        holdConnection();
     }
 
     function wsGetMessage(event) {
@@ -28,7 +76,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function wsClose() {
+    function wsClose(event) {
+        init();
         if (event.wasClean) {
             console.log('close');
         } else {
@@ -41,12 +90,23 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("Error: " + error.message);
     }
 
+    function onEnterInputTextMessage(event) {
+        if (event.keyCode == 13) {
+            sendMessage();
+        }
+    }
+
     function sendMessage() {
         var text = inputTextMessage.value;
-        if(text) {
+        var receiverTokenText = receiverToken.value;
+        if(text && receiverTokenText) {
             socket.send(
-                '{"id":1,"text":"' + text + '","author":{"id":2},"chat":{"id":3}}'
+                '{"id":1,"text":"'
+                + text + '","author":{"id":'
+                + token +'},"chat":{"id":'
+                + receiverTokenText + '}}'
             );
+            inputTextMessage.value = '';
         }
     }
 
