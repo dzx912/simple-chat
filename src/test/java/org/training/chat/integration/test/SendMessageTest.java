@@ -43,7 +43,7 @@ public class SendMessageTest {
         String text = "{\"id\":1,\"text\":\"hello\",\"author\":{\"id\":1},\"chat\":{\"id\":2}}";
         client1.setSendText(text);
         client2.setHandler(recieveText -> {
-            context.assertEquals("Echo message: " + text, recieveText);
+            context.assertEquals(text, recieveText);
             async.complete();
         });
 

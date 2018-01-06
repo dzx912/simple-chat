@@ -19,7 +19,7 @@ public class SendMessageHandler implements Handler<Message<String>> {
     public void handle(Message<String> data) {
         String message = data.body();
         System.out.println("WebSocket message: " + message);
-        webSocket.writeFinalTextFrame("Echo message: " + message);
+        webSocket.writeFinalTextFrame(message);
         data.reply("ok");
     }
 }

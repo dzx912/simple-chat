@@ -1,25 +1,53 @@
-console.log("hello");
+document.addEventListener("DOMContentLoaded", function() {
 
-var socket = new WebSocket("ws://localhost:8080/token/3");
+    var buttonSend = document.getElementById("buttonSend");
+    var inputTextMessage = document.getElementById("inputMessage");
+    var outputTextMessage = document.getElementById("outputMessage");
 
-socket.onopen = function() {
-  console.log("open");
-  socket.send('{"id":1,"text":"hello","author":{"id":2},"chat":{"id":3}}');
-};
+    var socket = new WebSocket("ws://localhost:8080/token/3");
 
-socket.onclose = function(event) {
-  if (event.wasClean) {
-    console.log('close');
-  } else {
-    console.log('Alarm close');
-  }
-  console.log('Code: ' + event.code + ' cause: ' + event.reason);
-};
+    buttonSend.addEventListener("click", sendMessage);
+    socket.addEventListener('open', wsConnect);
+    socket.addEventListener('message', wsGetMessage);
+    socket.addEventListener('close', wsClose);
+    socket.addEventListener('error', wsError);
 
-socket.onmessage = function(event) {
-  console.log("message: " + event.data);
-};
+    function wsConnect() {
+        console.log("open");
+        buttonSend.disabled = false;
+    }
 
-socket.onerror = function(error) {
-  console.log("Error: " + error.message);
-};
+    function wsGetMessage(event) {
+        var data = event.data;
+        console.log("message: " + data);
+        if(data) {
+            var oldText = outputTextMessage.value;
+
+            var jsonText = JSON.parse(data);
+            outputTextMessage.value = jsonText.text + "\n" + oldText;
+        }
+    }
+
+    function wsClose() {
+        if (event.wasClean) {
+            console.log('close');
+        } else {
+            console.log('Alarm close');
+        }
+        console.log('Code: ' + event.code + ' cause: ' + event.reason);
+    }
+
+    function wsError() {
+        console.log("Error: " + error.message);
+    }
+
+    function sendMessage() {
+        var text = inputTextMessage.value;
+        if(text) {
+            socket.send(
+                '{"id":1,"text":"' + text + '","author":{"id":2},"chat":{"id":3}}'
+            );
+        }
+    }
+
+});

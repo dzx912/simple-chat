@@ -60,7 +60,7 @@ public class ReceiveVerticleTest {
 
         vertx.createHttpClient().websocketStream(options).handler(
                 ws -> ws.frameHandler(wsf -> {
-                    context.assertEquals("Echo message: " + text, wsf.textData());
+                    context.assertEquals(text, wsf.textData());
                     async.complete();
                 }));
 
