@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.training.chat.constants.ServerOption;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
 
@@ -70,8 +71,8 @@ public class ReceiveVerticleTest {
 
     private RequestOptions getWSRequestOptions(String token) {
         RequestOptions options = new RequestOptions();
-        options.setHost("localhost");
-        options.setPort(8080);
+        options.setHost(ServerOption.getHost());
+        options.setPort(ServerOption.getPort());
         options.setURI("/token/" + token);
         return options;
     }

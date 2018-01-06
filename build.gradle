@@ -13,6 +13,8 @@ repositories {
 
 dependencies {
     compile group: 'io.vertx', name: 'vertx-core', version: versionVertx
+    compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
+
     testCompile group: 'io.vertx', name: 'vertx-unit', version: versionVertx
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

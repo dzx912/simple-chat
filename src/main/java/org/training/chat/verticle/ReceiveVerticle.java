@@ -5,6 +5,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
+import org.training.chat.constants.ServerOption;
 import org.training.chat.handler.SendMessageHandler;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
@@ -22,7 +23,7 @@ public class ReceiveVerticle extends AbstractVerticle {
 
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.websocketHandler(this::createWebSocketServer);
-        httpServer.listen(8080);
+        httpServer.listen(ServerOption.getPort());
     }
 
     private void createWebSocketServer(ServerWebSocket wsServer) {

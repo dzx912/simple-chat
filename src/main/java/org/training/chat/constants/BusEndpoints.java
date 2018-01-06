@@ -4,7 +4,7 @@ package org.training.chat.constants;
  * Адреса EventBus
  */
 public enum BusEndpoints {
-    ROUTER("/router"), TOKEN("/token%s");
+    ROUTER("/router"), TOKEN("/token/%s");
 
     private String path;
 
