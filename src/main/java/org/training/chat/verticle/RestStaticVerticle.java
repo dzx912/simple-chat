@@ -25,6 +25,6 @@ public class RestStaticVerticle extends AbstractVerticle {
 
         httpServer.requestHandler(httpRouter::accept);
 
-        httpServer.listen(8080);
+        httpServer.listen(8081);
     }
 }
