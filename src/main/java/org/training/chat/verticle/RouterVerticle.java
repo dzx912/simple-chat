@@ -2,6 +2,7 @@ package org.training.chat.verticle;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
@@ -18,13 +19,18 @@ public class RouterVerticle extends AbstractVerticle {
     }
 
     private void router(Message<String> data) {
-        final org.training.chat.data.Message message = Json.decodeValue(data.body(), org.training.chat.data.Message.class);
-        System.out.println("WebSocket message.text: " + message.getText());
+        try {
+            final org.training.chat.data.Message message = Json.decodeValue(data.body(), org.training.chat.data.Message.class);
+            System.out.println("WebSocket message.text: " + message.getText());
 
-        String token = String.format(TOKEN.getPath(), message.getChat().getId());
+            String token = String.format(TOKEN.getPath(), message.getChat().getId());
 
-        vertx.eventBus().send(token, data.body());
+            vertx.eventBus().send(token, data.body());
 
-        data.reply("ok");
+            data.reply("ok");
+        } catch (DecodeException exception) {
+            System.out.println("Wrong data for router: " + exception);
+            data.fail(-1, exception.getMessage());
+        }
     }
 }
