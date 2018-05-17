@@ -20,12 +20,17 @@ public class RouterVerticle extends AbstractVerticle {
 
     private void router(Message<String> data) {
         try {
-            final org.training.chat.data.Message message = Json.decodeValue(data.body(), org.training.chat.data.Message.class);
+            String jsonText = data.body();
+            if (jsonText.isEmpty()) {
+                data.fail(-2, "Empty json");
+                return;
+            }
+            final org.training.chat.data.Message message = Json.decodeValue(jsonText, org.training.chat.data.Message.class);
             System.out.println("WebSocket message.text: " + message.getText());
 
             String token = String.format(TOKEN.getPath(), message.getChat().getId());
 
-            vertx.eventBus().send(token, data.body());
+            vertx.eventBus().send(token, jsonText);
 
             data.reply("ok");
         } catch (DecodeException exception) {
