@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 public class WSClient {
     private final String token;
     private final Vertx vertx;
+    private WebSocket webSocket;
 
     private final List<Consumer<String>> handlers;
     private final List<String> sendText;
@@ -50,8 +51,13 @@ public class WSClient {
                 .handler(this::wsConnect);
     }
 
+    public void close() {
+        webSocket.close();
+    }
+
 
     private void wsConnect(WebSocket webSocket) {
+        this.webSocket = webSocket;
         webSocket.frameHandler(this::wsGetMessage);
 
         sendText.forEach(webSocket::writeFinalTextFrame);

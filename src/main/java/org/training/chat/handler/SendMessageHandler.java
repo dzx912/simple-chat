@@ -18,7 +18,7 @@ public class SendMessageHandler implements Handler<Message<String>> {
     @Override
     public void handle(Message<String> data) {
         String message = data.body();
-        System.out.println("WebSocket message: " + message);
+        System.out.println("SendMessageHandler WebSocket message: " + message);
         webSocket.writeFinalTextFrame(message);
         data.reply("ok");
     }

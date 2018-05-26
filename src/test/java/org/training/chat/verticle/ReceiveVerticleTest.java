@@ -2,6 +2,7 @@ package org.training.chat.verticle;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.RequestOptions;
+import io.vertx.core.http.WebSocketFrame;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -18,6 +19,10 @@ import static org.training.chat.constants.BusEndpoints.ROUTER;
  */
 @RunWith(VertxUnitRunner.class)
 public class ReceiveVerticleTest {
+
+    private final static String WEB_SOCKET_CLOSE = "\u0003�";
+
+    private final static String CHECK_TEXT = "checkText";
 
     private Vertx vertx;
 
@@ -37,36 +42,45 @@ public class ReceiveVerticleTest {
     public void testWebSocketSend(TestContext context) {
         final Async async = context.async();
 
-        String text = "checkText";
-
         vertx.eventBus().localConsumer(ROUTER.getPath(), receiveResult -> {
-            context.assertEquals(text, receiveResult.body());
+            context.assertEquals(CHECK_TEXT, receiveResult.body());
             async.complete();
         });
 
         RequestOptions options = getWSRequestOptions("1");
         vertx.createHttpClient()
                 .websocketStream(options)
-                .handler(ws -> ws.writeFinalTextFrame(text));
+                .handler(ws -> ws.writeFinalTextFrame(CHECK_TEXT));
     }
 
     @Test
     public void testWebSocketSendReceive(TestContext context) throws InterruptedException {
         final Async async = context.async();
 
-        String text = "checkText";
 
         RequestOptions options = getWSRequestOptions("2");
 
         vertx.createHttpClient().websocketStream(options).handler(
-                ws -> ws.frameHandler(wsf -> {
-                    context.assertEquals(text, wsf.textData());
-                    async.complete();
-                }));
+                ws -> ws.frameHandler(wsf -> receiveText(context, async, wsf)
+                ));
 
         Thread.sleep(500);
 
-        vertx.eventBus().send("/token/2", text);
+        vertx.eventBus().send("/token/2", CHECK_TEXT);
+    }
+
+    private void receiveText(TestContext context, Async async, WebSocketFrame wsf) {
+        String actualText = wsf.textData();
+        System.out.println("Actual receiver text: " + actualText);
+        boolean isMainText = CHECK_TEXT.equals(actualText);
+        boolean isCloseText = WEB_SOCKET_CLOSE.equals(actualText);
+        boolean textEquals = isMainText || isCloseText;
+
+        context.assertTrue(textEquals);
+
+        if (isMainText) {
+            async.complete();
+        }
     }
 
     private RequestOptions getWSRequestOptions(String token) {

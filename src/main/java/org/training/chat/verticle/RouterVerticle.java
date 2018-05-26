@@ -13,6 +13,8 @@ import static org.training.chat.constants.BusEndpoints.TOKEN;
  */
 public class RouterVerticle extends AbstractVerticle {
 
+    private final static String WEB_SOCKET_CLOSE = "\u0003�";
+
     @Override
     public void start() {
         vertx.eventBus().localConsumer(ROUTER.getPath(), this::router);
@@ -21,14 +23,17 @@ public class RouterVerticle extends AbstractVerticle {
     private void router(Message<String> data) {
         try {
             String jsonText = data.body();
-            if (jsonText.isEmpty()) {
+
+            if (jsonText.isEmpty() || WEB_SOCKET_CLOSE.equals(jsonText)) {
                 data.fail(-2, "Empty json");
                 return;
             }
+            System.out.println("RouterVerticle WebSocket message: " + jsonText);
+
             final org.training.chat.data.Message message = Json.decodeValue(jsonText, org.training.chat.data.Message.class);
-            System.out.println("WebSocket message.text: " + message.getText());
 
             String token = String.format(TOKEN.getPath(), message.getChat().getId());
+            System.out.println("Receiver token: " + token);
 
             vertx.eventBus().send(token, jsonText);
 
