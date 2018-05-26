@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.integration.client.WSClient;
-import org.training.chat.verticle.ReceiveVerticle;
+import org.training.chat.verticle.WsServerVerticle;
 import org.training.chat.verticle.RouterVerticle;
 
 /**
@@ -24,7 +24,7 @@ public class SendMessageTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.deployVerticle(ReceiveVerticle.class.getName(), context.asyncAssertSuccess());
+        vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
     }
 

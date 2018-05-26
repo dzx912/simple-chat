@@ -18,7 +18,7 @@ import static org.training.chat.constants.BusEndpoints.ROUTER;
  * Unit test for actor Receive WebSocket
  */
 @RunWith(VertxUnitRunner.class)
-public class ReceiveVerticleTest {
+public class WsServerVerticleTest {
 
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
 
@@ -30,7 +30,7 @@ public class ReceiveVerticleTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.deployVerticle(ReceiveVerticle.class.getName(), context.asyncAssertSuccess());
+        vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
     }
 
     @After

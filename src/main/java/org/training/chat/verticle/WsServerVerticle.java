@@ -13,7 +13,7 @@ import static org.training.chat.constants.BusEndpoints.ROUTER;
 /**
  * Actor для приема сообщений
  */
-public class ReceiveVerticle extends AbstractVerticle {
+public class WsServerVerticle extends AbstractVerticle {
 
     private EventBus eventBus;
 
