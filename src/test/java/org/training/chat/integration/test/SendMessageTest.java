@@ -4,19 +4,23 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.integration.client.WSClient;
-import org.training.chat.verticle.WsServerVerticle;
 import org.training.chat.verticle.RouterVerticle;
+import org.training.chat.verticle.WsServerVerticle;
 
 /**
  * Интеграционный тест, проверяющий отправку и доставку сообщений
  */
 @RunWith(VertxUnitRunner.class)
 public class SendMessageTest {
+
+    private final Logger logger = LogManager.getLogger(SendMessageTest.class);
 
     private Vertx vertx;
 
@@ -43,7 +47,7 @@ public class SendMessageTest {
         String text = "{\"id\":1,\"text\":\"hello\",\"author\":{\"id\":1},\"chat\":{\"id\":2}}";
         client1.setSendText(text);
         client2.setHandler(receiveText -> {
-            System.out.println("Receive text: " + receiveText);
+            logger.info("Receive text: " + receiveText);
             context.assertEquals(text, receiveText);
 
             client1.close();

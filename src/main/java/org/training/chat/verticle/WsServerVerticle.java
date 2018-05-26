@@ -5,6 +5,8 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
 import org.training.chat.handler.SendMessageHandler;
 
@@ -14,6 +16,8 @@ import static org.training.chat.constants.BusEndpoints.ROUTER;
  * Actor для приема сообщений
  */
 public class WsServerVerticle extends AbstractVerticle {
+
+    private final Logger logger = LogManager.getLogger(WsServerVerticle.class);
 
     private EventBus eventBus;
 
@@ -30,7 +34,7 @@ public class WsServerVerticle extends AbstractVerticle {
 
         // Извлекаем из WebSocket подключение адрес, обычно мы здесь посылаем токен
         String path = wsServer.path();
-        System.out.println("Create WebSocket server with path: " + path);
+        logger.info("Create WebSocket server with path: " + path);
 
         // Подключаем обработчик WebSocket сообщений
         wsServer.frameHandler(ws -> eventBus.send(ROUTER.getPath(), ws.textData()));
@@ -41,7 +45,7 @@ public class WsServerVerticle extends AbstractVerticle {
         // Снимаем обработчик, после закрытия WebSocket'а
         wsServer.closeHandler(aVoid -> {
             consumerSendMessage.unregister();
-            System.out.println("Close connect with: " + path);
+            logger.info("Close connect with: " + path);
         });
     }
 }

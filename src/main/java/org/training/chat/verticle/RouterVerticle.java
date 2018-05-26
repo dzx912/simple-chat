@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
 import static org.training.chat.constants.BusEndpoints.TOKEN;
@@ -14,6 +16,7 @@ import static org.training.chat.constants.BusEndpoints.TOKEN;
 public class RouterVerticle extends AbstractVerticle {
 
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
+    private final Logger logger = LogManager.getLogger(RouterVerticle.class);
 
     @Override
     public void start() {
@@ -28,18 +31,18 @@ public class RouterVerticle extends AbstractVerticle {
                 data.fail(-2, "Empty json");
                 return;
             }
-            System.out.println("RouterVerticle WebSocket message: " + jsonText);
+            logger.info("RouterVerticle WebSocket message: " + jsonText);
 
             final org.training.chat.data.Message message = Json.decodeValue(jsonText, org.training.chat.data.Message.class);
 
             String token = String.format(TOKEN.getPath(), message.getChat().getId());
-            System.out.println("Receiver token: " + token);
+            logger.info("Receiver token: " + token);
 
             vertx.eventBus().send(token, jsonText);
 
             data.reply("ok");
         } catch (DecodeException exception) {
-            System.out.println("Wrong data for router: " + exception);
+            logger.info("Wrong data for router: " + exception);
             data.fail(-1, exception.getMessage());
         }
     }

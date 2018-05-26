@@ -1,9 +1,9 @@
 package org.training.chat;
 
 import io.vertx.core.Vertx;
-import org.training.chat.verticle.WsServerVerticle;
 import org.training.chat.verticle.RestStaticVerticle;
 import org.training.chat.verticle.RouterVerticle;
+import org.training.chat.verticle.WsServerVerticle;
 
 public class MainApp {
 

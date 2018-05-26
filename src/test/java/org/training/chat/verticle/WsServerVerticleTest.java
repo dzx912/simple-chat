@@ -6,6 +6,8 @@ import io.vertx.core.http.WebSocketFrame;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,9 +23,8 @@ import static org.training.chat.constants.BusEndpoints.ROUTER;
 public class WsServerVerticleTest {
 
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
-
     private final static String CHECK_TEXT = "checkText";
-
+    private final Logger logger = LogManager.getLogger(WsServerVerticleTest.class);
     private Vertx vertx;
 
     @Before
@@ -71,7 +72,7 @@ public class WsServerVerticleTest {
 
     private void receiveText(TestContext context, Async async, WebSocketFrame wsf) {
         String actualText = wsf.textData();
-        System.out.println("Actual receiver text: " + actualText);
+        logger.info("Actual receiver text: " + actualText);
         boolean isMainText = CHECK_TEXT.equals(actualText);
         boolean isCloseText = WEB_SOCKET_CLOSE.equals(actualText);
         boolean textEquals = isMainText || isCloseText;

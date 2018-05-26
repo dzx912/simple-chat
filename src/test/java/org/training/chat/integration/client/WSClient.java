@@ -18,10 +18,10 @@ import java.util.function.Consumer;
 public class WSClient {
     private final String token;
     private final Vertx vertx;
-    private WebSocket webSocket;
-
     private final List<Consumer<String>> handlers;
     private final List<String> sendText;
+
+    private WebSocket webSocket;
 
     public WSClient(Vertx vertx, String token) {
         if (vertx == null) {
