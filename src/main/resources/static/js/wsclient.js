@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", function() {
         socket.addEventListener('message', wsGetMessage);
         socket.addEventListener('close', wsClose);
         socket.addEventListener('error', wsError);
+
+        addTextMessage("SERVER: ", "Connect like " + token)
     }
 
     function wsConnect() {
@@ -76,25 +78,10 @@ document.addEventListener("DOMContentLoaded", function() {
         var data = event.data;
         console.log("message: " + data);
         if(data) {
-            var oldText = outputTextMessage.value;
-
-            var jsonText = JSON.parse(data);
-            outputTextMessage.value = jsonText.message.text + "\n" + oldText;
+            var json = JSON.parse(data);
+            var author = json.metadata.author.id + ": ";
+            addTextMessage(author, json.message.text);
         }
-    }
-
-    function wsClose(event) {
-        init();
-        if (event.wasClean) {
-            console.log('close');
-        } else {
-            console.log('Alarm close');
-        }
-        console.log('Code: ' + event.code + ' cause: ' + event.reason);
-    }
-
-    function wsError() {
-        console.log("Error: " + error.message);
     }
 
     function onEnterInputTextMessage(event) {
@@ -107,13 +94,40 @@ document.addEventListener("DOMContentLoaded", function() {
         var text = inputTextMessage.value;
         var receiverTokenText = receiverToken.value;
         if(text && receiverTokenText) {
-            socket.send(
-                '{"clientId":1,"text":"'
-                + text + '","chat":{"id":'
-                + receiverTokenText + '}}'
-            );
-            inputTextMessage.value = '';
+            sendMessageAndPutToConversation(text, receiverTokenText)
         }
+    }
+
+    function sendMessageAndPutToConversation(text, receiverTokenText) {
+        socket.send(
+            '{"clientId":1,"text":"'
+            + text + '","chat":{"id":'
+            + receiverTokenText + '}}'
+        );
+        inputTextMessage.value = '';
+
+        addTextMessage("Me: ", text);
+    }
+
+    function addTextMessage(author, message) {
+        var oldText = outputTextMessage.value;
+
+        outputTextMessage.value = author + message + "\n" + oldText;
+    }
+
+    function wsClose(event) {
+        init();
+        if (event.wasClean) {
+            console.log('close');
+        } else {
+            console.log('Alarm close');
+        }
+        console.log('Code: ' + event.code + ' cause: ' + event.reason);
+        addTextMessage("SERVER: ", "Disconnect")
+    }
+
+    function wsError() {
+        console.log("Error: " + error.message);
     }
 
 });
