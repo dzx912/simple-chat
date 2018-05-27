@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var oldText = outputTextMessage.value;
 
             var jsonText = JSON.parse(data);
-            outputTextMessage.value = jsonText.text + "\n" + oldText;
+            outputTextMessage.value = jsonText.message.text + "\n" + oldText;
         }
     }
 

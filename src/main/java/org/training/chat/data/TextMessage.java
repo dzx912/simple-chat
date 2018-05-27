@@ -1,5 +1,7 @@
 package org.training.chat.data;
 
+import java.util.Objects;
+
 /**
  * POJO объект, хранящий сообщение от клиента
  */
@@ -40,5 +42,21 @@ public class TextMessage {
 
     public void setChat(Chat chat) {
         this.chat = chat;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextMessage that = (TextMessage) o;
+        return Objects.equals(clientId, that.clientId) &&
+                Objects.equals(text, that.text) &&
+                Objects.equals(chat, that.chat);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(clientId, text, chat);
     }
 }

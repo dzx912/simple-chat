@@ -1,6 +1,6 @@
 package org.training.chat.data;
 
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Метаданные о сообщении (автор, дата приема)
@@ -8,11 +8,14 @@ import java.time.LocalDateTime;
  */
 public class Metadata {
     private User author;
-    private LocalDateTime data;
+    private Long timestamp;
 
-    public Metadata(User author, LocalDateTime data) {
+    public Metadata() {
+    }
+
+    public Metadata(User author, Long timestamp) {
         this.author = author;
-        this.data = data;
+        this.timestamp = timestamp;
     }
 
     public User getAuthor() {
@@ -23,11 +26,26 @@ public class Metadata {
         this.author = author;
     }
 
-    public LocalDateTime getData() {
-        return data;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public void setData(LocalDateTime data) {
-        this.data = data;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Metadata metadata = (Metadata) o;
+        return Objects.equals(author, metadata.author) &&
+                Objects.equals(timestamp, metadata.timestamp);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(author, timestamp);
     }
 }

@@ -10,9 +10,10 @@ import io.vertx.core.http.ServerWebSocket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
+import org.training.chat.data.CommonMessage;
+import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
 
-import static org.training.chat.constants.BusEndpoints.ROUTER;
 import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
 
 /**
@@ -40,25 +41,29 @@ public class WsServerVerticle extends AbstractVerticle {
         String path = wsServer.path();
         logger.info("Create WebSocket server with path: " + path);
 
-        wsServer.pause();
-        vertx.eventBus().send(
-                VALIDATE_TOKEN.getPath(),
-                path,
-                answer -> validateToken(wsServer, answer)
-        );
-
+        validateConnection(wsServer, path);
 
         // Подключаем обработчик WebSocket сообщений
-        wsServer.frameHandler(ws -> eventBus.send(ROUTER.getPath(), ws.textData()));
+        wsServer.frameHandler(new ReceiveMessageHandler(vertx, wsServer));
 
         // Делаем обработчик события, что кто-то хочет написать в этот WebSocket
-        MessageConsumer<String> consumerSendMessage = eventBus.localConsumer(path, new SendMessageHandler(wsServer));
+        MessageConsumer<CommonMessage> consumerSendMessage =
+                eventBus.localConsumer(path, new SendMessageHandler(wsServer));
 
         // Снимаем обработчик, после закрытия WebSocket'а
         wsServer.closeHandler(aVoid -> {
             consumerSendMessage.unregister();
             logger.info("Close connect with: " + path);
         });
+    }
+
+    private void validateConnection(ServerWebSocket wsServer, String path) {
+        wsServer.pause();
+        vertx.eventBus().send(
+                VALIDATE_TOKEN.getPath(),
+                path,
+                answer -> validateToken(wsServer, answer)
+        );
     }
 
     private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<Object>> answer) {
