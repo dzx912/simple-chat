@@ -32,6 +32,7 @@ public class WsServerVerticleTest {
         vertx = Vertx.vertx();
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
+        vertx.deployVerticle(ValidateTokenVerticle.class.getName(), context.asyncAssertSuccess());
     }
 
     @After

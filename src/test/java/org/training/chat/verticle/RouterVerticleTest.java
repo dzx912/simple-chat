@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.data.Chat;
-import org.training.chat.data.Message;
+import org.training.chat.data.TextMessage;
 import org.training.chat.data.User;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
@@ -42,13 +42,11 @@ public class RouterVerticleTest {
 
         String text = "checkText";
         long idMessage = 1L;
-        long idUser = 2L;
         long idChat = 3L;
         String tokenUser = String.format(TOKEN.getPath(), idChat);
         final String jsonRequest = Json.encodePrettily(
-                new Message(idMessage,
+                new TextMessage(idMessage,
                         text,
-                        new User(idUser),
                         new Chat(idChat))
         );
 

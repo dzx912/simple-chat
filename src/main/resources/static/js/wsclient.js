@@ -108,9 +108,8 @@ document.addEventListener("DOMContentLoaded", function() {
         var receiverTokenText = receiverToken.value;
         if(text && receiverTokenText) {
             socket.send(
-                '{"id":1,"text":"'
-                + text + '","author":{"id":'
-                + token +'},"chat":{"id":'
+                '{"clientId":1,"text":"'
+                + text + '","chat":{"id":'
                 + receiverTokenText + '}}'
             );
             inputTextMessage.value = '';
