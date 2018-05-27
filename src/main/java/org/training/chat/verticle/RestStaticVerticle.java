@@ -5,8 +5,10 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.ErrorHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import org.training.chat.constants.ServerOption;
 
 /**
+ * HTTP сервер, который раздает файлы (статический контент)
  */
 public class RestStaticVerticle extends AbstractVerticle {
 
@@ -25,6 +27,6 @@ public class RestStaticVerticle extends AbstractVerticle {
 
         httpServer.requestHandler(httpRouter::accept);
 
-        httpServer.listen(8081);
+        httpServer.listen(ServerOption.getStaticServerPort());
     }
 }

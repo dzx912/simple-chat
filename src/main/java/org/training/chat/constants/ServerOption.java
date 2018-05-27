@@ -6,6 +6,7 @@ package org.training.chat.constants;
 public class ServerOption {
     private static final String host = "localhost";
     private static final int port = 8080;
+    private static final int staticServerPort = 8081;
     private ServerOption() {
     }
 
@@ -15,5 +16,9 @@ public class ServerOption {
 
     public static int getPort() {
         return port;
+    }
+
+    public static int getStaticServerPort() {
+        return staticServerPort;
     }
 }
