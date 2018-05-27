@@ -1,7 +1,9 @@
 package org.training.chat.verticle;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
@@ -11,6 +13,7 @@ import org.training.chat.constants.ServerOption;
 import org.training.chat.handler.SendMessageHandler;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
+import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
 
 /**
  * Actor для приема сообщений
@@ -28,6 +31,7 @@ public class WsServerVerticle extends AbstractVerticle {
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.websocketHandler(this::createWebSocketServer);
         httpServer.listen(ServerOption.getPort());
+        logger.debug("Deploy " + WsServerVerticle.class);
     }
 
     private void createWebSocketServer(ServerWebSocket wsServer) {
@@ -35,6 +39,14 @@ public class WsServerVerticle extends AbstractVerticle {
         // Извлекаем из WebSocket подключение адрес, обычно мы здесь посылаем токен
         String path = wsServer.path();
         logger.info("Create WebSocket server with path: " + path);
+
+        wsServer.pause();
+        vertx.eventBus().send(
+                VALIDATE_TOKEN.getPath(),
+                path,
+                answer -> validateToken(wsServer, answer)
+        );
+
 
         // Подключаем обработчик WebSocket сообщений
         wsServer.frameHandler(ws -> eventBus.send(ROUTER.getPath(), ws.textData()));
@@ -48,4 +60,17 @@ public class WsServerVerticle extends AbstractVerticle {
             logger.info("Close connect with: " + path);
         });
     }
+
+    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<Object>> answer) {
+        if (answer.succeeded()) {
+            wsServer.resume();
+            logger.debug("Token correct: " + answer.result().body());
+        } else {
+            String errorMessage = answer.cause().getMessage();
+            logger.warn(errorMessage);
+            wsServer.close((short) -1, errorMessage);
+        }
+    }
+
+
 }

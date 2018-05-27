@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.verticle.RestStaticVerticle;
 import org.training.chat.verticle.RouterVerticle;
+import org.training.chat.verticle.ValidateTokenVerticle;
 import org.training.chat.verticle.WsServerVerticle;
 
 public class MainApp {
@@ -18,5 +19,6 @@ public class MainApp {
         vertx.deployVerticle(new WsServerVerticle());
         vertx.deployVerticle(new RouterVerticle());
         vertx.deployVerticle(new RestStaticVerticle());
+        vertx.deployVerticle(new ValidateTokenVerticle());
     }
 }
