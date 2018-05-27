@@ -50,8 +50,8 @@ public class SendMessageTest {
             logger.info("Receive text: " + receiveText);
             context.assertEquals(text, receiveText);
 
-            client1.close();
             client2.close();
+            client1.close();
 
             async.complete();
         });
