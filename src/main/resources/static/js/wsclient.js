@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     buttonConnect.addEventListener("click", onConnect);
 
     buttonSend.addEventListener("click", sendMessage);
+    inputToken.addEventListener("keypress", onEnterInputToken);
     inputTextMessage.addEventListener("keypress", onEnterInputTextMessage);
 
     init();
@@ -39,6 +40,12 @@ document.addEventListener("DOMContentLoaded", function() {
         buttonSend.disabled = false;
         receiverToken.disabled = false;
         inputTextMessage.disabled = false;
+    }
+
+    function onEnterInputToken(event) {
+        if (event.keyCode == 13) {
+            onConnect();
+        }
     }
 
     function onConnect() {
