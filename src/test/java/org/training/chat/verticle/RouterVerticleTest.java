@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.training.chat.codec.CommonMessageCodec;
+import org.training.chat.codec.Codec;
 import org.training.chat.data.Chat;
 import org.training.chat.data.RequestMessage;
 import org.training.chat.data.TextMessage;
@@ -32,7 +32,7 @@ public class RouterVerticleTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.eventBus().registerDefaultCodec(TextMessage.class, new CommonMessageCodec<>(TextMessage.class));
+        vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
 
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
 

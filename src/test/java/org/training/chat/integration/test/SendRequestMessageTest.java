@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.training.chat.codec.CommonMessageCodec;
+import org.training.chat.codec.Codec;
 import org.training.chat.data.Chat;
 import org.training.chat.data.TextMessage;
 import org.training.chat.integration.client.WSClient;
@@ -38,8 +38,8 @@ public class SendRequestMessageTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.eventBus().registerDefaultCodec(TextMessage.class, new CommonMessageCodec<>(TextMessage.class));
-        vertx.eventBus().registerDefaultCodec(Chat.class, new CommonMessageCodec<>(Chat.class));
+        vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
+        vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());

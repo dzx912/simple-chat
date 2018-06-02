@@ -3,7 +3,7 @@ package org.training.chat;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.training.chat.codec.CommonMessageCodec;
+import org.training.chat.codec.Codec;
 import org.training.chat.data.Chat;
 import org.training.chat.data.TextMessage;
 import org.training.chat.verticle.*;
@@ -22,8 +22,8 @@ public class MainApp {
     }
 
     private static void registerCodec(Vertx vertx) {
-        vertx.eventBus().registerDefaultCodec(TextMessage.class, new CommonMessageCodec<>(TextMessage.class));
-        vertx.eventBus().registerDefaultCodec(Chat.class, new CommonMessageCodec<>(Chat.class));
+        vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
+        vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
     }
 
     private static void deploy(Vertx vertx) {

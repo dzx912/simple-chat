@@ -5,13 +5,13 @@ import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.core.json.Json;
 
 /**
- * Codec для передачи TextMessage
+ * Универсальный Vertx codec для передачи пользовательских сообщений
  */
-public class CommonMessageCodec<T> implements MessageCodec<T, T> {
+public class Codec<T> implements MessageCodec<T, T> {
 
     private final Class<T> clazz;
 
-    public CommonMessageCodec(Class<T> clazz) {
+    public Codec(Class<T> clazz) {
         this.clazz = clazz;
     }
 
