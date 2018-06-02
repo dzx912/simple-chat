@@ -15,6 +15,10 @@ import static org.training.chat.constants.BusEndpoints.ROUTER;
 
 /**
  * Actor, который берет TempMessage и генерирует CommonMessage
+ * TempMessage нужен, чтобы передать данные от клиента и его метаданные в "сыром виде".
+ * Например, JSON сообщения в виде текстовой строки.
+ * <p>
+ * CommonMessage нужен, чтобы хранить всю информацию о сообщении в структурированном классе.
  */
 public class MetadataVerticle extends AbstractVerticle {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
