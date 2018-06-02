@@ -7,13 +7,17 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
-import org.training.chat.data.CommonMessage;
+import org.training.chat.data.Chat;
+import org.training.chat.data.TextMessage;
 import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
 
+import static org.training.chat.constants.BusEndpoints.DB_LOAD_MESSAGES_BY_CHAT;
 import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
 
 /**
@@ -43,11 +47,13 @@ public class WsServerVerticle extends AbstractVerticle {
 
         validateConnection(wsServer, path);
 
+        sendHistory(wsServer, path);
+
         // Подключаем обработчик WebSocket сообщений
         wsServer.frameHandler(new ReceiveMessageHandler(vertx, wsServer));
 
         // Делаем обработчик события, что кто-то хочет написать в этот WebSocket
-        MessageConsumer<CommonMessage> consumerSendMessage =
+        MessageConsumer<TextMessage> consumerSendMessage =
                 eventBus.localConsumer(path, new SendMessageHandler(wsServer));
 
         // Снимаем обработчик, после закрытия WebSocket'а
@@ -55,6 +61,24 @@ public class WsServerVerticle extends AbstractVerticle {
             consumerSendMessage.unregister();
             logger.info("Close connect with: " + path);
         });
+    }
+
+    private void sendHistory(ServerWebSocket wsServer, String path) {
+        String token = path.substring(7);
+
+        Chat chat = new Chat(Long.valueOf(token));
+        vertx.eventBus().send(
+                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
+                chat,
+                (AsyncResult<Message<String>> result) -> answerSendHistory(wsServer, result)
+        );
+    }
+
+    private void answerSendHistory(ServerWebSocket wsServer, AsyncResult<Message<String>> result) {
+        String messages = result.result().body();
+        JsonArray jsonMessages = new JsonArray(messages);
+        JsonObject history = new JsonObject().put("history", jsonMessages);
+        wsServer.writeFinalTextFrame(history.encode());
     }
 
     private void validateConnection(ServerWebSocket wsServer, String path) {

@@ -11,22 +11,26 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.codec.CommonMessageCodec;
-import org.training.chat.data.CommonMessage;
+import org.training.chat.data.Chat;
+import org.training.chat.data.TextMessage;
 import org.training.chat.integration.client.WSClient;
 import org.training.chat.verticle.MetadataVerticle;
 import org.training.chat.verticle.RouterVerticle;
 import org.training.chat.verticle.ValidateTokenVerticle;
 import org.training.chat.verticle.WsServerVerticle;
 
+import static org.training.chat.constants.BusEndpoints.DB_LOAD_MESSAGES_BY_CHAT;
+import static org.training.chat.constants.BusEndpoints.DB_SAVE_MESSAGE;
+
 /**
  * Интеграционный тест, проверяющий отправку и доставку сообщений
  */
 @RunWith(VertxUnitRunner.class)
-public class SendTextMessageTest {
+public class SendRequestMessageTest {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
 
 
-    private final Logger logger = LogManager.getLogger(SendTextMessageTest.class);
+    private final Logger logger = LogManager.getLogger(SendRequestMessageTest.class);
 
     private Vertx vertx;
 
@@ -34,7 +38,8 @@ public class SendTextMessageTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.eventBus().registerDefaultCodec(CommonMessage.class, new CommonMessageCodec());
+        vertx.eventBus().registerDefaultCodec(TextMessage.class, new CommonMessageCodec<>(TextMessage.class));
+        vertx.eventBus().registerDefaultCodec(Chat.class, new CommonMessageCodec<>(Chat.class));
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
@@ -51,21 +56,24 @@ public class SendTextMessageTest {
     public void testSendTextMessage(TestContext context) {
         final Async async = context.async();
 
+        vertx.eventBus().consumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(), (empty) -> {
+        });
+        vertx.eventBus().consumer(DB_SAVE_MESSAGE.getPath(), (empty) -> {
+        });
+
         WSClient client1 = new WSClient(vertx, "1");
         WSClient client2 = new WSClient(vertx, "2");
 
         String text = "{\"clientId\":1,\"text\":\"hello\",\"chat\":{\"id\":2}}";
-        String startExpected = "{\"metadata\":{\"author\":{\"id\":1},\"timestamp\":";
-        //1234567890123
-        String finishExpected = "},\"message\":{\"clientId\":1,\"text\":\"hello\",\"chat\":{\"id\":2}}}";
+        String answerStartExpected = "{\"author\":{\"id\":1},\"chatId\":2,\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
+
         client1.setSendText(text);
         client2.setHandler(receiveText -> {
             logger.info("Receive text: " + receiveText);
             boolean isCloseWebSocket = WEB_SOCKET_CLOSE.equals(receiveText);
             if (!isCloseWebSocket) {
-                context.assertEquals(startExpected, receiveText.substring(0, startExpected.length()));
-                int lengthTimestamp = 13;
-                context.assertEquals(finishExpected, receiveText.substring(startExpected.length() + lengthTimestamp));
+                context.assertEquals(answerStartExpected,
+                        receiveText.substring(0, answerStartExpected.length()));
 
                 client2.close();
                 client1.close();

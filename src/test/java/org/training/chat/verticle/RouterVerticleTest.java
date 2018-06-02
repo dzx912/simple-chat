@@ -9,7 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.codec.CommonMessageCodec;
-import org.training.chat.data.*;
+import org.training.chat.data.Chat;
+import org.training.chat.data.RequestMessage;
+import org.training.chat.data.TextMessage;
+import org.training.chat.data.User;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
 import static org.training.chat.constants.BusEndpoints.TOKEN;
@@ -23,24 +26,24 @@ public class RouterVerticleTest {
     private Vertx vertx;
 
     private long idChat = 3L;
-    private CommonMessage correctMessage;
+    private TextMessage correctMessage;
 
     @Before
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.eventBus().registerDefaultCodec(CommonMessage.class, new CommonMessageCodec());
+        vertx.eventBus().registerDefaultCodec(TextMessage.class, new CommonMessageCodec<>(TextMessage.class));
 
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
 
-        TextMessage textMessage =
-                new TextMessage(2L, "text message", new Chat(idChat));
-        correctMessage = new CommonMessage(
-                new Metadata(
-                        new User(1L),
-                        10L),
-
-                textMessage
+        RequestMessage requestMessage =
+                new RequestMessage(2L, "text message", new Chat(idChat));
+        correctMessage = new TextMessage(
+                new User(1L),
+                idChat,
+                "text message",
+                3L,
+                10L
         );
     }
 
@@ -49,7 +52,7 @@ public class RouterVerticleTest {
         vertx.close(context.asyncAssertSuccess());
     }
 
-    @Test
+    @Test(timeout = 10_000)
     public void routerShouldSendCorrectData(TestContext context) {
         final Async async = context.async();
 

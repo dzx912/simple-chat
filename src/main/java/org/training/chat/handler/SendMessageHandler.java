@@ -6,12 +6,12 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.training.chat.data.CommonMessage;
+import org.training.chat.data.TextMessage;
 
 /**
  * Handler, который отправляет в WebSocket сообщение от сервера -> клиенту
  */
-public class SendMessageHandler implements Handler<Message<CommonMessage>> {
+public class SendMessageHandler implements Handler<Message<TextMessage>> {
 
     private final Logger logger = LogManager.getLogger(SendMessageHandler.class);
 
@@ -22,8 +22,8 @@ public class SendMessageHandler implements Handler<Message<CommonMessage>> {
     }
 
     @Override
-    public void handle(Message<CommonMessage> data) {
-        CommonMessage message = data.body();
+    public void handle(Message<TextMessage> data) {
+        TextMessage message = data.body();
         logger.info("WebSocket message: " + message);
         webSocket.writeFinalTextFrame(Json.encode(message));
         data.reply("ok");

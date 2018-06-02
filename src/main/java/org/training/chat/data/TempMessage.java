@@ -2,7 +2,7 @@ package org.training.chat.data;
 
 /**
  * POJO, необходимый для передачи временных данных
- * Чтобы потом сформировать CommonMessage
+ * Чтобы потом сформировать TextMessage
  */
 public class TempMessage {
 

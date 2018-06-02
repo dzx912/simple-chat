@@ -67,7 +67,12 @@ document.addEventListener("DOMContentLoaded", function() {
         socket.addEventListener('close', wsClose);
         socket.addEventListener('error', wsError);
 
-        addTextMessage("SERVER: ", "Connect like " + token)
+        clearHistory();
+        addTextMessage("SERVER: ", "Connect like " + token);
+    }
+
+    function clearHistory() {
+        outputTextMessage.value = "";
     }
 
     function wsConnect() {
@@ -79,9 +84,27 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("message: " + data);
         if(data) {
             var json = JSON.parse(data);
-            var author = json.metadata.author.id + ": ";
-            addTextMessage(author, json.message.text);
+            routerWsMessage(json);
         }
+    }
+
+    function routerWsMessage(json) {
+        if(json.history) {
+            showHistory(json.history);
+        } else if(json.chatId) {
+            showMessage(json);
+        }
+    }
+
+    function showHistory(history) {
+        history.forEach(function(message) {
+            showMessage(message);
+        });
+    }
+
+    function showMessage(message) {
+        var author = message.author.id + ": ";
+        addTextMessage(author, message.text);
     }
 
     function onEnterInputTextMessage(event) {

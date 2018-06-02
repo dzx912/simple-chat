@@ -4,11 +4,9 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.training.chat.data.CommonMessage;
 import org.training.chat.data.TextMessage;
 
-import static org.training.chat.constants.BusEndpoints.ROUTER;
-import static org.training.chat.constants.BusEndpoints.TOKEN;
+import static org.training.chat.constants.BusEndpoints.*;
 
 /**
  * Actor для маршрутизации обработки сообщений от клиента
@@ -23,18 +21,17 @@ public class RouterVerticle extends AbstractVerticle {
         logger.debug("Deploy " + RouterVerticle.class);
     }
 
-    private void router(Message<CommonMessage> data) {
+    private void router(Message<TextMessage> data) {
         try {
-            CommonMessage commonMessage = data.body();
+            TextMessage textMessage = data.body();
 
-            logger.info("WebSocket commonMessage: " + commonMessage);
+            logger.info("WebSocket textMessage: " + textMessage);
 
-            final TextMessage textMessage = commonMessage.getMessage();
-
-            String token = String.format(TOKEN.getPath(), textMessage.getChat().getId());
+            String token = String.format(TOKEN.getPath(), textMessage.getChatId());
             logger.info("Receiver token: " + token);
 
-            vertx.eventBus().send(token, commonMessage);
+            vertx.eventBus().send(token, textMessage);
+            vertx.eventBus().send(DB_SAVE_MESSAGE.getPath(), textMessage);
 
             data.reply("ok");
         } catch (ClassCastException exception) {

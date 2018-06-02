@@ -5,7 +5,10 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.training.chat.data.*;
+import org.training.chat.data.RequestMessage;
+import org.training.chat.data.TempMessage;
+import org.training.chat.data.TextMessage;
+import org.training.chat.data.User;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,11 +17,11 @@ import static org.training.chat.constants.BusEndpoints.GENERATE_COMMON_MESSAGE;
 import static org.training.chat.constants.BusEndpoints.ROUTER;
 
 /**
- * Actor, который берет TempMessage и генерирует CommonMessage
+ * Actor, который берет TempMessage и генерирует TextMessage
  * TempMessage нужен, чтобы передать данные от клиента и его метаданные в "сыром виде".
  * Например, JSON сообщения в виде текстовой строки.
  * <p>
- * CommonMessage нужен, чтобы хранить всю информацию о сообщении в структурированном классе.
+ * TextMessage нужен, чтобы хранить всю информацию о сообщении в структурированном классе.
  */
 public class MetadataVerticle extends AbstractVerticle {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
@@ -38,20 +41,23 @@ public class MetadataVerticle extends AbstractVerticle {
 
         boolean webSocketIsClosed = clientMessage.isEmpty() || WEB_SOCKET_CLOSE.equals(clientMessage);
         if (!webSocketIsClosed) {
-            CommonMessage commonMessage = generate(tempMessage, clientMessage);
-            vertx.eventBus().send(ROUTER.getPath(), commonMessage);
+            TextMessage textMessage = generate(tempMessage, clientMessage);
+            vertx.eventBus().send(ROUTER.getPath(), textMessage);
             data.reply("ok");
         } else {
             data.fail(-1, "Empty client message");
         }
     }
 
-    private CommonMessage generate(TempMessage tempMessage, String clientMessage) {
+    private TextMessage generate(TempMessage tempMessage, String clientMessage) {
         User author = new User(Long.valueOf(tempMessage.getToken()));
         long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        Metadata metadata = new Metadata(author, timestamp);
 
-        TextMessage textMessage = Json.decodeValue(clientMessage, TextMessage.class);
-        return new CommonMessage(metadata, textMessage);
+        RequestMessage requestMessage = Json.decodeValue(clientMessage, RequestMessage.class);
+        return new TextMessage(author,
+                requestMessage.getChat().getId(),
+                requestMessage.getText(),
+                requestMessage.getClientId(),
+                timestamp);
     }
 }

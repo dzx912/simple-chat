@@ -1,31 +1,46 @@
 package org.training.chat.data;
 
+import io.vertx.core.json.Json;
+
 import java.util.Objects;
 
 /**
- * POJO объект, хранящий сообщение от клиента
+ * Общее сообщение, с частью, полученной от клиента
+ * И добавленными метаданными на сервере
  */
 public class TextMessage {
 
-    private Long clientId;
+    private User author;
+    private Long chatId;
     private String text;
-    private Chat chat;
+    private Long clientId;
+    private Long timestamp;
 
     public TextMessage() {
     }
 
-    public TextMessage(Long clientId, String text, Chat chat) {
-        this.clientId = clientId;
+    public TextMessage(User author, Long chatId, String text, Long clientId, Long timestamp) {
+        this.author = author;
+        this.chatId = chatId;
         this.text = text;
-        this.chat = chat;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
         this.clientId = clientId;
+        this.timestamp = timestamp;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public String getText() {
@@ -36,12 +51,25 @@ public class TextMessage {
         this.text = text;
     }
 
-    public Chat getChat() {
-        return chat;
+    public Long getClientId() {
+        return clientId;
     }
 
-    public void setChat(Chat chat) {
-        this.chat = chat;
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return Json.encode(this);
     }
 
     @Override
@@ -49,14 +77,16 @@ public class TextMessage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TextMessage that = (TextMessage) o;
-        return Objects.equals(clientId, that.clientId) &&
+        return Objects.equals(author, that.author) &&
+                Objects.equals(chatId, that.chatId) &&
                 Objects.equals(text, that.text) &&
-                Objects.equals(chat, that.chat);
+                Objects.equals(clientId, that.clientId) &&
+                Objects.equals(timestamp, that.timestamp);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(clientId, text, chat);
+        return Objects.hash(author, chatId, text, clientId, timestamp);
     }
 }

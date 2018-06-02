@@ -18,8 +18,7 @@ import org.training.chat.codec.CommonMessageCodec;
 import org.training.chat.constants.ServerOption;
 import org.training.chat.data.*;
 
-import static org.training.chat.constants.BusEndpoints.GENERATE_COMMON_MESSAGE;
-import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
+import static org.training.chat.constants.BusEndpoints.*;
 
 /**
  * Unit test for actor Receive WebSocket
@@ -28,6 +27,7 @@ import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
 public class WsServerVerticleTest {
 
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
+    private final static String TEXT_HISTORY = "{\"history\":[]}";
     private final static String CHECK_TEXT = "checkText";
     private final Logger logger = LogManager.getLogger(WsServerVerticleTest.class);
     private Vertx vertx;
@@ -36,9 +36,24 @@ public class WsServerVerticleTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.eventBus().registerDefaultCodec(CommonMessage.class, new CommonMessageCodec());
+        vertx.eventBus().registerDefaultCodec(TextMessage.class, new CommonMessageCodec<>(TextMessage.class));
+        vertx.eventBus().registerDefaultCodec(Chat.class, new CommonMessageCodec<>(Chat.class));
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
+
+        deployCommonConsumer();
+    }
+
+    private void deployCommonConsumer() {
+        vertx.eventBus().localConsumer(VALIDATE_TOKEN.getPath(),
+                data -> data.reply(data.body())
+        );
+        vertx.eventBus().localConsumer(DB_SAVE_MESSAGE.getPath(),
+                data -> data.reply("1")
+        );
+        vertx.eventBus().localConsumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(),
+                data -> data.reply("[]")
+        );
     }
 
     @After
@@ -46,13 +61,9 @@ public class WsServerVerticleTest {
         vertx.close(context.asyncAssertSuccess());
     }
 
-    @Test
+    @Test(timeout = 10_000)
     public void testWebSocketSend(TestContext context) {
         final Async async = context.async();
-
-        vertx.eventBus().localConsumer(VALIDATE_TOKEN.getPath(),
-                data -> data.reply(data.body())
-        );
 
         String token = "1";
         TempMessage tempMessage = new TempMessage(token, CHECK_TEXT);
@@ -69,24 +80,20 @@ public class WsServerVerticleTest {
                 .handler(ws -> ws.writeFinalTextFrame(CHECK_TEXT));
     }
 
-    @Test
+    @Test(timeout = 10_000)
     public void testWebSocketSendReceive(TestContext context) throws InterruptedException {
         final Async async = context.async();
 
         Long idChat = 2L;
 
-        TextMessage textMessage =
-                new TextMessage(2L, "text message", new Chat(idChat));
-        CommonMessage correctMessage = new CommonMessage(
-                new Metadata(
-                        new User(1L),
-                        10L),
-
-                textMessage
-        );
-
-        vertx.eventBus().localConsumer(VALIDATE_TOKEN.getPath(),
-                data -> data.reply(data.body())
+        RequestMessage requestMessage =
+                new RequestMessage(2L, "text message", new Chat(idChat));
+        TextMessage correctMessage = new TextMessage(
+                new User(1L),
+                2L,
+                "text message",
+                3L,
+                10L
         );
 
         RequestOptions options = getWSRequestOptions(idChat.toString());
@@ -100,23 +107,42 @@ public class WsServerVerticleTest {
         vertx.eventBus().send("/token/2", correctMessage);
     }
 
-    private void receiveText(TestContext context, Async async, WebSocketFrame wsf, CommonMessage correctMessage) {
-        try {
-            String jsonCommonMessage = wsf.textData();
-            boolean isCloseText = WEB_SOCKET_CLOSE.equals(jsonCommonMessage);
-            if (!isCloseText) {
-                CommonMessage actualMessage = Json.decodeValue(jsonCommonMessage, CommonMessage.class);
+    private void receiveText(TestContext context, Async async, WebSocketFrame wsf, TextMessage correctMessage) {
+        String jsonCommonMessage = wsf.textData();
+        boolean isCloseText = WEB_SOCKET_CLOSE.equals(jsonCommonMessage);
+        boolean isHistory = TEXT_HISTORY.equals(jsonCommonMessage);
+        if (!isCloseText && !isHistory) {
+            try {
+                TextMessage actualMessage = Json.decodeValue(jsonCommonMessage, TextMessage.class);
                 logger.info("Actual receiver text: " + actualMessage);
 
                 context.assertEquals(correctMessage, actualMessage);
                 async.complete();
+            } catch (DecodeException e) {
+                logger.error(e.toString());
+                context.fail();
             }
-
-        } catch (DecodeException e) {
-            logger.error(e.toString());
-            context.fail();
         }
+    }
 
+    @Test(timeout = 10_000)
+    public void afterOpenWsShouldGetHistory(TestContext context) {
+        final Async async = context.async();
+
+        RequestOptions options = getWSRequestOptions("3");
+
+        vertx.createHttpClient().websocketStream(options).handler(
+                ws -> ws.frameHandler(wsf -> checkHistory(context, async, wsf)
+                ));
+    }
+
+    private void checkHistory(TestContext context, Async async, WebSocketFrame wsf) {
+        String message = wsf.textData();
+        boolean isCloseText = WEB_SOCKET_CLOSE.equals(message);
+        if (!isCloseText) {
+            context.assertEquals(TEXT_HISTORY, message);
+            async.complete();
+        }
     }
 
     private RequestOptions getWSRequestOptions(String token) {

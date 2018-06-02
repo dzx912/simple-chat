@@ -3,14 +3,20 @@ package org.training.chat.codec;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.core.json.Json;
-import org.training.chat.data.CommonMessage;
 
 /**
- * Codec для передачи CommonMessage
+ * Codec для передачи TextMessage
  */
-public class CommonMessageCodec implements MessageCodec<CommonMessage, CommonMessage> {
+public class CommonMessageCodec<T> implements MessageCodec<T, T> {
+
+    private final Class<T> clazz;
+
+    public CommonMessageCodec(Class<T> clazz) {
+        this.clazz = clazz;
+    }
+
     @Override
-    public void encodeToWire(Buffer buffer, CommonMessage customMessage) {
+    public void encodeToWire(Buffer buffer, T customMessage) {
         // Encode object to string
         String jsonToStr = Json.encode(customMessage);
 
@@ -23,7 +29,7 @@ public class CommonMessageCodec implements MessageCodec<CommonMessage, CommonMes
     }
 
     @Override
-    public CommonMessage decodeFromWire(int position, Buffer buffer) {
+    public T decodeFromWire(int position, Buffer buffer) {
         // Length of JSON
         int dataLength = buffer.getInt(position);
 
@@ -34,11 +40,11 @@ public class CommonMessageCodec implements MessageCodec<CommonMessage, CommonMes
         int finishShitToLengthData = startShiftToIntSize + dataLength;
 
         String jsonStr = buffer.getString(startShiftToIntSize, finishShitToLengthData);
-        return Json.decodeValue(jsonStr, CommonMessage.class);
+        return Json.decodeValue(jsonStr, clazz);
     }
 
     @Override
-    public CommonMessage transform(CommonMessage commonMessage) {
+    public T transform(T commonMessage) {
         // If a message is sent *locally* across the event bus.
         // This example sends message just as is
         return commonMessage;
@@ -48,7 +54,7 @@ public class CommonMessageCodec implements MessageCodec<CommonMessage, CommonMes
     public String name() {
         // Each codec must have a unique name.
         // This is used to identify a codec when sending a message and for unregistering codecs.
-        return this.getClass().getSimpleName();
+        return clazz.getSimpleName();
     }
 
     @Override
