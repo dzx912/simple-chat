@@ -65,7 +65,7 @@ public class SendRequestMessageTest {
         WSClient client2 = new WSClient(vertx, "2");
 
         String text = "{\"clientId\":1,\"text\":\"hello\",\"chat\":{\"id\":2}}";
-        String answerStartExpected = "{\"author\":{\"id\":1},\"chatId\":2,\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
+        String answerStartExpected = "{\"type\":\"text\",\"content\":{\"author\":{\"id\":1},\"chatId\":2,\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
 
         client1.setSendText(text);
         client2.setHandler(receiveText -> {

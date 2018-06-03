@@ -80,19 +80,25 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function wsGetMessage(event) {
-        var data = event.data;
-        console.log("message: " + data);
-        if(data) {
-            var json = JSON.parse(data);
+        console.log("message: " + event.data);
+
+        if(event.data) {
+            var json = JSON.parse(event.data);
             routerWsMessage(json);
         }
     }
 
     function routerWsMessage(json) {
-        if(json.history) {
-            showHistory(json.history);
-        } else if(json.chatId) {
-            showMessage(json);
+        switch (json.type) {
+            case "history":
+                showHistory(json.content.history);
+                break;
+            case "text":
+                showMessage(json.content);
+                break;
+            default:
+                console.log("Неизвестный тип сообщения");
+                break;
         }
     }
 

@@ -5,6 +5,7 @@ import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocketFrame;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -27,7 +28,7 @@ import static org.training.chat.constants.BusEndpoints.*;
 public class WsServerVerticleTest {
 
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
-    private final static String TEXT_HISTORY = "{\"history\":[]}";
+    private final static String TEXT_HISTORY = "{\"type\":\"history\",\"content\":{\"history\":[]}}";
     private final static String CHECK_TEXT = "checkText";
     private final Logger logger = LogManager.getLogger(WsServerVerticleTest.class);
     private Vertx vertx;
@@ -108,21 +109,31 @@ public class WsServerVerticleTest {
     }
 
     private void receiveText(TestContext context, Async async, WebSocketFrame wsf, TextMessage correctMessage) {
-        String jsonCommonMessage = wsf.textData();
-        boolean isCloseText = WEB_SOCKET_CLOSE.equals(jsonCommonMessage);
-        boolean isHistory = TEXT_HISTORY.equals(jsonCommonMessage);
+        String message = wsf.textData();
+        boolean isCloseText = WEB_SOCKET_CLOSE.equals(message);
+        boolean isHistory = TEXT_HISTORY.equals(message);
         if (!isCloseText && !isHistory) {
             try {
-                TextMessage actualMessage = Json.decodeValue(jsonCommonMessage, TextMessage.class);
-                logger.info("Actual receiver text: " + actualMessage);
-
-                context.assertEquals(correctMessage, actualMessage);
+                logger.info("Actual receiver message: " + message);
+                assertTextMessage(context, correctMessage, message);
                 async.complete();
             } catch (DecodeException e) {
                 logger.error(e.toString());
                 context.fail();
             }
         }
+    }
+
+    private void assertTextMessage(TestContext context, TextMessage correctMessage, String message) {
+        JsonObject json = new JsonObject(message);
+
+        context.assertEquals("text", json.getString("type"));
+
+        JsonObject contentMessage = json.getJsonObject("content");
+        String jsonTextMessage = Json.encode(contentMessage);
+        TextMessage actualMessage = Json.decodeValue(jsonTextMessage, TextMessage.class);
+
+        context.assertEquals(correctMessage, actualMessage);
     }
 
     @Test(timeout = 10_000)

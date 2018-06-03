@@ -67,7 +67,7 @@ public class RouterVerticleTest {
     }
 
     @Test
-    public void sendUncorrectedDataShouldShouldFailed(TestContext context) {
+    public void sendUncorrectedDataShouldFailed(TestContext context) {
         final Async async = context.async();
 
         String uncorrectedMessage = "uncorrected json";
@@ -80,7 +80,7 @@ public class RouterVerticleTest {
     }
 
     @Test
-    public void sendCorrectDataShouldShouldSuccess(TestContext context) {
+    public void sendCorrectDataShouldSuccess(TestContext context) {
         final Async async = context.async();
 
         vertx.eventBus().send(ROUTER.getPath(), correctMessage, answer -> {

@@ -3,7 +3,7 @@ package org.training.chat.data;
 import java.util.Objects;
 
 /**
- * POJO объект, хранящий сообщение от клиента
+ * POJO объект, принимающий сообщение от клиента
  */
 public class RequestMessage {
 

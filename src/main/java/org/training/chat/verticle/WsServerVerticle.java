@@ -7,12 +7,14 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
 import org.training.chat.data.Chat;
+import org.training.chat.data.ResponseMessage;
 import org.training.chat.data.TextMessage;
 import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
@@ -76,9 +78,15 @@ public class WsServerVerticle extends AbstractVerticle {
 
     private void answerSendHistory(ServerWebSocket wsServer, AsyncResult<Message<String>> result) {
         String messages = result.result().body();
+        String responseHistory = createResponseHistory(messages);
+        wsServer.writeFinalTextFrame(responseHistory);
+    }
+
+    private String createResponseHistory(String messages) {
         JsonArray jsonMessages = new JsonArray(messages);
         JsonObject history = new JsonObject().put("history", jsonMessages);
-        wsServer.writeFinalTextFrame(history.encode());
+        ResponseMessage response = new ResponseMessage("history", history);
+        return Json.encode(response);
     }
 
     private void validateConnection(ServerWebSocket wsServer, String path) {
