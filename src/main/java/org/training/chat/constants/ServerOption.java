@@ -5,8 +5,9 @@ package org.training.chat.constants;
  */
 public class ServerOption {
     private static final String host = "localhost";
-    private static final int port = 8080;
-    private static final int staticServerPort = 8081;
+    private static final int httpPort = 8080;
+    private static final int wsPort = 8081;
+
     private ServerOption() {
     }
 
@@ -14,11 +15,12 @@ public class ServerOption {
         return host;
     }
 
-    public static int getPort() {
-        return port;
+    public static int getWsPort() {
+        return wsPort;
     }
 
-    public static int getStaticServerPort() {
-        return staticServerPort;
+    public static int getHttpPort() {
+        return httpPort;
     }
+
 }

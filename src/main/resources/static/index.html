@@ -1,23 +1,40 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="js/wsclient.js"></script>
+        <title>Chat</title>
+        <script src="js/storage.js"></script>
+        <script src="js/chatClient.js"></script>
+        <script src="js/registration.js"></script>
+        <script src="js/mainApp.js"></script>
     </head>
 
     <body>
-        <h1>Chat</h1>
-        <input id="inputToken" type="text" placeholder="my login...">
-        <button id="buttonConnect">Connect</button>
-        <br/><br/>
+        <div id="registrationPanel">
+            <h1>Registration</h1>
 
-        <input id="receiverToken" type="text" placeholder="receiver's login...">
-        <br/><br/>
+            <input id="inputLogin" type="text" placeholder="my login...">
+            <input id="inputFirstName" type="text" placeholder="firstName...">
+            <input id="inputLastName" type="text" placeholder="lastName...">
+            <br/><br/>
+            <button id="buttonSignUp">Sign up</button>
+        </div>
 
-        <input id="inputMessage" type="text" placeholder="text textMessage...">
-        <button id="buttonSend" disabled>Send</button>
-        <br/>
+        <div id="chatPanel">
+            <h1>Chat</h1>
+            <button id="buttonLogout">Logout</button>
+            <br/>
+            <span>My token: <span id="tokenOutput"></span></span>
+            <br/><br/>
 
-        <h2>Messages:</h2>
-        <textarea id="outputMessage" placeholder="Conversation" disabled cols="40" rows="8"></textarea>
+            <input id="receiverToken" type="text" placeholder="receiver's login...">
+            <br/><br/>
+
+            <input id="inputMessage" type="text" placeholder="text message...">
+            <button id="buttonSend">Send</button>
+            <br/>
+
+            <h2>Messages:</h2>
+            <textarea id="outputMessage" placeholder="Conversation" disabled cols="40" rows="8"></textarea>
+        </div>
     </body>
 </html>

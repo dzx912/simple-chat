@@ -6,23 +6,23 @@ package org.training.chat.data;
  */
 public class TempMessage {
 
-    private String token;
+    private UserDto user;
     private String message;
 
     public TempMessage() {
     }
 
-    public TempMessage(String token, String message) {
-        this.token = token;
+    public TempMessage(UserDto user, String message) {
+        this.user = user;
         this.message = message;
     }
 
-    public String getToken() {
-        return token;
+    public UserDto getUser() {
+        return user;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 
     public String getMessage() {

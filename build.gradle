@@ -4,6 +4,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
+//TODO: update to 3.5.2
 def versionVertx = '3.5.1'
 def versionLog4j = '2.11.0'
 def mainClass = 'org.training.chat.MainApp'

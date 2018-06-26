@@ -12,7 +12,7 @@ import org.training.chat.codec.Codec;
 import org.training.chat.data.Chat;
 import org.training.chat.data.RequestMessage;
 import org.training.chat.data.TextMessage;
-import org.training.chat.data.User;
+import org.training.chat.data.UserDto;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER;
 import static org.training.chat.constants.BusEndpoints.TOKEN;
@@ -39,7 +39,7 @@ public class RouterVerticleTest {
         RequestMessage requestMessage =
                 new RequestMessage(2L, "text message", new Chat(idChat));
         correctMessage = new TextMessage(
-                new User(1L),
+                new UserDto("id", "login", "firstName", "lastName"),
                 idChat,
                 "text message",
                 3L,

@@ -16,14 +16,14 @@ import org.training.chat.constants.ServerOption;
 import org.training.chat.data.Chat;
 import org.training.chat.data.ResponseMessage;
 import org.training.chat.data.TextMessage;
+import org.training.chat.data.UserDto;
 import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
 
-import static org.training.chat.constants.BusEndpoints.DB_LOAD_MESSAGES_BY_CHAT;
-import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
+import static org.training.chat.constants.BusEndpoints.*;
 
 /**
- * Actor для приема сообщений
+ * Actor, обслуживающий WebSocket соединение
  */
 public class WsServerVerticle extends AbstractVerticle {
 
@@ -37,8 +37,10 @@ public class WsServerVerticle extends AbstractVerticle {
 
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.websocketHandler(this::createWebSocketServer);
-        httpServer.listen(ServerOption.getPort());
+        httpServer.listen(ServerOption.getWsPort());
         logger.debug("Deploy " + WsServerVerticle.class);
+
+        eventBus.localConsumer(SEND_HISTORY.getPath(), this::sendHistoryToUser);
     }
 
     private void createWebSocketServer(ServerWebSocket wsServer) {
@@ -48,11 +50,6 @@ public class WsServerVerticle extends AbstractVerticle {
         logger.info("Create WebSocket server with path: " + path);
 
         validateConnection(wsServer, path);
-
-        sendHistory(wsServer, path);
-
-        // Подключаем обработчик WebSocket сообщений
-        wsServer.frameHandler(new ReceiveMessageHandler(vertx, wsServer));
 
         // Делаем обработчик события, что кто-то хочет написать в этот WebSocket
         MessageConsumer<TextMessage> consumerSendMessage =
@@ -94,14 +91,22 @@ public class WsServerVerticle extends AbstractVerticle {
         vertx.eventBus().send(
                 VALIDATE_TOKEN.getPath(),
                 path,
-                answer -> validateToken(wsServer, answer)
+                (AsyncResult<Message<UserDto>> answer) -> validateToken(wsServer, answer, path)
         );
     }
 
-    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<Object>> answer) {
+    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<UserDto>> answer, String path) {
         if (answer.succeeded()) {
             wsServer.resume();
-            logger.debug("Token correct: " + answer.result().body());
+            UserDto user = answer.result().body();
+            logger.debug("Token correct: " + user);
+
+            // Подключаем обработчик WebSocket сообщений
+            wsServer.frameHandler(new ReceiveMessageHandler(vertx, wsServer, user));
+
+            eventBus.send(SEND_HISTORY.getPath(), path,
+                    (AsyncResult<Message<String>> result) -> answerSendHistory(wsServer, result)
+            );
         } else {
             String errorMessage = answer.cause().getMessage();
             logger.warn(errorMessage);
@@ -109,5 +114,16 @@ public class WsServerVerticle extends AbstractVerticle {
         }
     }
 
+    private void sendHistoryToUser(Message<String> data) {
+        String path = data.body();
+        String token = path.substring(7);
+
+        Chat chat = new Chat(Long.valueOf(token));
+        vertx.eventBus().send(
+                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
+                chat,
+                answer -> data.reply(answer.result().body())
+        );
+    }
 
 }

@@ -72,7 +72,7 @@ public class WSClient {
     private RequestOptions getWSRequestOptions() {
         RequestOptions options = new RequestOptions();
         options.setHost(ServerOption.getHost());
-        options.setPort(ServerOption.getPort());
+        options.setPort(ServerOption.getWsPort());
         options.setURI("/token/" + token);
         return options;
     }

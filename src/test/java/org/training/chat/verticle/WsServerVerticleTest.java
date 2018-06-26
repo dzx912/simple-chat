@@ -30,6 +30,7 @@ public class WsServerVerticleTest {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
     private final static String TEXT_HISTORY = "{\"type\":\"history\",\"content\":{\"history\":[]}}";
     private final static String CHECK_TEXT = "checkText";
+    private final static UserDto USER = new UserDto("1", "dzx912", "Anton", "Lenok");
     private final Logger logger = LogManager.getLogger(WsServerVerticleTest.class);
     private Vertx vertx;
 
@@ -39,6 +40,7 @@ public class WsServerVerticleTest {
 
         vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
+        vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
 
@@ -47,7 +49,7 @@ public class WsServerVerticleTest {
 
     private void deployCommonConsumer() {
         vertx.eventBus().localConsumer(VALIDATE_TOKEN.getPath(),
-                data -> data.reply(data.body())
+                data -> data.reply(USER)
         );
         vertx.eventBus().localConsumer(DB_SAVE_MESSAGE.getPath(),
                 data -> data.reply("1")
@@ -67,7 +69,7 @@ public class WsServerVerticleTest {
         final Async async = context.async();
 
         String token = "1";
-        TempMessage tempMessage = new TempMessage(token, CHECK_TEXT);
+        TempMessage tempMessage = new TempMessage(USER, CHECK_TEXT);
         String json = Json.encode(tempMessage);
 
         vertx.eventBus().localConsumer(GENERATE_COMMON_MESSAGE.getPath(), receiveResult -> {
@@ -90,7 +92,7 @@ public class WsServerVerticleTest {
         RequestMessage requestMessage =
                 new RequestMessage(2L, "text message", new Chat(idChat));
         TextMessage correctMessage = new TextMessage(
-                new User(1L),
+                new UserDto("id", "login", "firstName", "lastName"),
                 2L,
                 "text message",
                 3L,
@@ -159,7 +161,7 @@ public class WsServerVerticleTest {
     private RequestOptions getWSRequestOptions(String token) {
         RequestOptions options = new RequestOptions();
         options.setHost(ServerOption.getHost());
-        options.setPort(ServerOption.getPort());
+        options.setPort(ServerOption.getWsPort());
         options.setURI("/token/" + token);
         return options;
     }

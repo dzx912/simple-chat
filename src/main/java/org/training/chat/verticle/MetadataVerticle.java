@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.training.chat.data.RequestMessage;
 import org.training.chat.data.TempMessage;
 import org.training.chat.data.TextMessage;
-import org.training.chat.data.User;
+import org.training.chat.data.UserDto;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,11 +50,10 @@ public class MetadataVerticle extends AbstractVerticle {
     }
 
     private TextMessage generate(TempMessage tempMessage, String clientMessage) {
-        User author = new User(Long.valueOf(tempMessage.getToken()));
         long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
         RequestMessage requestMessage = Json.decodeValue(clientMessage, RequestMessage.class);
-        return new TextMessage(author,
+        return new TextMessage(tempMessage.getUser(),
                 requestMessage.getChat().getId(),
                 requestMessage.getText(),
                 requestMessage.getClientId(),
