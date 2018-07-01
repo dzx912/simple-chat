@@ -96,12 +96,14 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
         init();
     }
 
-    this.send = function(text, receiverTokenText) {
-        socket.send(
-            '{"clientId":1,"text":"'
-            + text + '","chatId":'
-            + receiverTokenText + '}'
-        );
+    this.send = function(textMessage, receiverToken) {
+        var json = JSON.stringify({
+          clientId: 1,
+          text: textMessage,
+          chatId: receiverToken
+        });
+
+        socket.send(json);
 
         addTextMessage("Me: ", text);
 
