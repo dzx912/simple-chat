@@ -34,13 +34,14 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        logger.debug("Deploy " + MongoDbVerticle.class);
         client = MongoClient.createShared(vertx, new JsonObject()
                 .put("db_name", DB_NAME));
         vertx.eventBus().consumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(), this::loadMessageByChat);
         vertx.eventBus().consumer(DB_SAVE_MESSAGE.getPath(), this::saveMessage);
         vertx.eventBus().consumer(DB_REGISTER_USER.getPath(), this::registerUser);
         vertx.eventBus().consumer(DB_FIND_USER.getPath(), this::findUser);
+
+        logger.debug("Deploy " + MongoDbVerticle.class);
     }
 
     private void findUser(Message<String> data) {
@@ -86,9 +87,23 @@ public class MongoDbVerticle extends AbstractVerticle {
     }
 
     private void saveMessage(Message<TextMessage> data) {
-        save(data, data.body(), TAG_MESSAGE);
+        JsonObject jsonMessage = new JsonObject(Json.encode(data.body()));
+
+        Handler<AsyncResult<String>> resultHandler =
+                (savedResult) -> handlerSaved(savedResult, data);
+
+        client.insert(TAG_MESSAGE, jsonMessage, resultHandler);
     }
 
+    private <T> void handlerSaved(AsyncResult<String> savedResult, Message<T> data) {
+        if (savedResult.succeeded()) {
+            logger.debug("Save: " + savedResult.result());
+            data.reply(savedResult.result());
+        } else {
+            logger.error("Save: " + savedResult.cause());
+            data.fail(-1, savedResult.cause().getMessage());
+        }
+    }
 
     private void registerUser(Message<RequestAuthorization> data) {
         User user = new User(data.body());
@@ -117,24 +132,5 @@ public class MongoDbVerticle extends AbstractVerticle {
                 data.fail(-1, savedResult.cause().getMessage());
             }
         });
-    }
-
-    private <T, U> void save(Message<T> data, U message, String tag) {
-        JsonObject jsonMessage = new JsonObject(Json.encode(message));
-
-        Handler<AsyncResult<String>> resultHandler =
-                (savedResult) -> handlerSaved(savedResult, data);
-
-        client.insert(tag, jsonMessage, resultHandler);
-    }
-
-    private <T> void handlerSaved(AsyncResult<String> savedResult, Message<T> data) {
-        if (savedResult.succeeded()) {
-            logger.debug("Save: " + savedResult.result());
-            data.reply(savedResult.result());
-        } else {
-            logger.error("Save: " + savedResult.cause());
-            data.fail(-1, savedResult.cause().getMessage());
-        }
     }
 }
