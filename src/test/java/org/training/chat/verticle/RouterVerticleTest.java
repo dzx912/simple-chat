@@ -36,8 +36,6 @@ public class RouterVerticleTest {
 
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
 
-        RequestMessage requestMessage =
-                new RequestMessage(2L, "text message", new Chat(idChat));
         correctMessage = new TextMessage(
                 new UserDto("id", "login", "firstName", "lastName"),
                 idChat,
