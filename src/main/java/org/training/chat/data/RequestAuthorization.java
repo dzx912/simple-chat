@@ -8,6 +8,15 @@ public class RequestAuthorization {
     private String firstName;
     private String lastName;
 
+    public RequestAuthorization() {
+    }
+
+    public RequestAuthorization(String login, String firstName, String lastName) {
+        this.login = login;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public String getLogin() {
         return login;
     }

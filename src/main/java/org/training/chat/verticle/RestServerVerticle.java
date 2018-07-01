@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
@@ -51,27 +52,37 @@ public class RestServerVerticle extends AbstractVerticle {
     }
 
     private void signUp(RoutingContext routingContext) {
+        String signUpData = routingContext.getBodyAsString();
+        HttpServerResponse serverResponse = routingContext.response();
         try {
-            String signUpData = routingContext.getBodyAsString();
             RequestAuthorization requestAuthorization =
                     Json.decodeValue(signUpData, RequestAuthorization.class);
 
             vertx.eventBus().send(DB_REGISTER_USER.getPath(), requestAuthorization,
                     (AsyncResult<Message<User>> result) ->
-                            answerRegistration(result, routingContext));
+                            answerRegistration(result, serverResponse));
         } catch (DecodeException e) {
             logger.error(e);
-            routingContext.fail(e);
+            returnErrorMessage(signUpData, serverResponse, e);
         }
     }
 
-    private void answerRegistration(AsyncResult<Message<User>> messageAsyncResult, RoutingContext routingContext) {
+    private void returnErrorMessage(String signUpData, HttpServerResponse serverResponse, DecodeException e) {
+        String message = String.format("Uncorrect JSON authorization, must be like this: %s\nAnd you send: %s",
+                "{\"login\":\"nick\",\"firstName\":\"Tom\",\"lastName\":\"Tyler\"}",
+                signUpData);
+        serverResponse.setStatusCode(500);
+        serverResponse.end(message);
+    }
+
+    private void answerRegistration(AsyncResult<Message<User>> messageAsyncResult, HttpServerResponse serverResponse) {
         if (messageAsyncResult.succeeded()) {
             String token = messageAsyncResult.result().body().getToken();
             logger.info("Register user by token: " + token);
-            routingContext.response().end(token);
+            serverResponse.end(token);
         } else {
-            routingContext.fail(messageAsyncResult.cause());
+            serverResponse.setStatusCode(500);
+            serverResponse.setStatusMessage(messageAsyncResult.cause().getMessage());
         }
     }
 }
