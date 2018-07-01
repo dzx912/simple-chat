@@ -2,6 +2,7 @@ package org.training.chat.verticle;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,16 +37,20 @@ public class MetadataVerticle extends AbstractVerticle {
 
     private void generateCommonMessage(Message<String> data) {
         String jsonRequest = data.body();
-        TempMessage tempMessage = Json.decodeValue(jsonRequest, TempMessage.class);
-        String clientMessage = tempMessage.getMessage();
+        try {
+            TempMessage tempMessage = Json.decodeValue(jsonRequest, TempMessage.class);
+            String clientMessage = tempMessage.getMessage();
 
-        boolean webSocketIsClosed = clientMessage.isEmpty() || WEB_SOCKET_CLOSE.equals(clientMessage);
-        if (!webSocketIsClosed) {
-            TextMessage textMessage = generate(tempMessage, clientMessage);
-            vertx.eventBus().send(ROUTER.getPath(), textMessage);
-            data.reply("ok");
-        } else {
-            data.fail(-1, "Empty client message");
+            boolean webSocketIsClosed = clientMessage.isEmpty() || WEB_SOCKET_CLOSE.equals(clientMessage);
+            if (!webSocketIsClosed) {
+                TextMessage textMessage = generate(tempMessage, clientMessage);
+                vertx.eventBus().send(ROUTER.getPath(), textMessage);
+                data.reply("ok");
+            } else {
+                data.fail(-1, "Empty client message");
+            }
+        } catch (DecodeException e) {
+            data.fail(-2, "Cannot deserialize data: " + jsonRequest);
         }
     }
 

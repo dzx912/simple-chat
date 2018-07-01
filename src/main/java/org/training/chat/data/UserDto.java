@@ -69,7 +69,6 @@ public class UserDto {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(id, login, firstName, lastName);
     }
 
