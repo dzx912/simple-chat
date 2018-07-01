@@ -24,7 +24,7 @@ import static org.training.chat.constants.BusEndpoints.*;
  * Actor, для работы с БД
  */
 public class MongoDbVerticle extends AbstractVerticle {
-    private final static String DB_NAME = "my_DB";
+    private final static String DB_NAME = "messenger";
     private final static String TAG_MESSAGE = "message";
     private final static String TAG_USER = "user";
 
@@ -74,9 +74,9 @@ public class MongoDbVerticle extends AbstractVerticle {
         }
     }
 
-    private void loadMessageByChat(Message<Chat> data) {
-        Chat chat = data.body();
-        JsonObject jsonChat = new JsonObject().put("chatId", chat.getId());
+    private void loadMessageByChat(Message<UserDto> data) {
+        UserDto user = data.body();
+        JsonObject jsonChat = new JsonObject().put("author.id", user.getId());
         client.find(TAG_MESSAGE, jsonChat,
                 result -> {
                     List<JsonObject> history = result.result();

@@ -104,7 +104,7 @@ public class WsServerVerticle extends AbstractVerticle {
             // Подключаем обработчик WebSocket сообщений
             wsServer.frameHandler(new ReceiveMessageHandler(vertx, wsServer, user));
 
-            eventBus.send(SEND_HISTORY.getPath(), path,
+            eventBus.send(SEND_HISTORY.getPath(), user,
                     (AsyncResult<Message<String>> result) -> answerSendHistory(wsServer, result)
             );
         } else {
@@ -114,14 +114,11 @@ public class WsServerVerticle extends AbstractVerticle {
         }
     }
 
-    private void sendHistoryToUser(Message<String> data) {
-        String path = data.body();
-        String token = path.substring(7);
-
-        Chat chat = new Chat(Long.valueOf(token));
+    private void sendHistoryToUser(Message<UserDto> data) {
+        UserDto user = data.body();
         vertx.eventBus().send(
                 DB_LOAD_MESSAGES_BY_CHAT.getPath(),
-                chat,
+                user,
                 answer -> data.reply(answer.result().body())
         );
     }
