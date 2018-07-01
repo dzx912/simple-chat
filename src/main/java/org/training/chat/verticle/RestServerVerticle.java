@@ -20,7 +20,9 @@ import org.training.chat.data.db.User;
 import static org.training.chat.constants.BusEndpoints.DB_REGISTER_USER;
 
 /**
- * HTTP сервер, который раздает файлы (статический контент)
+ * HTTP сервер, выполнеяет две функции:
+ * 1 - раздает файлы (статический контент)
+ * 2 - обслуживает REST методы (регистрация пользователя)
  */
 public class RestServerVerticle extends AbstractVerticle {
 
