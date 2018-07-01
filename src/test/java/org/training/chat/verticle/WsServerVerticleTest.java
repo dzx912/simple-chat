@@ -87,19 +87,19 @@ public class WsServerVerticleTest {
     public void testWebSocketSendReceive(TestContext context) throws InterruptedException {
         final Async async = context.async();
 
-        Long idChat = 2L;
+        String idChat = "2";
 
         RequestMessage requestMessage =
-                new RequestMessage(2L, "text message", new Chat(idChat));
+                new RequestMessage(2L, "text message", idChat);
         TextMessage correctMessage = new TextMessage(
                 new UserDto("id", "login", "firstName", "lastName"),
-                2L,
+                "2",
                 "text message",
                 3L,
                 10L
         );
 
-        RequestOptions options = getWSRequestOptions(idChat.toString());
+        RequestOptions options = getWSRequestOptions(idChat);
 
         vertx.createHttpClient().websocketStream(options).handler(
                 ws -> ws.frameHandler(wsf -> receiveText(context, async, wsf, correctMessage)

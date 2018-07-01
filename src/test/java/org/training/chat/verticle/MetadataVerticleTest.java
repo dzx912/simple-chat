@@ -49,8 +49,8 @@ public class MetadataVerticleTest {
         // Подготовка данных
         String text = "hello";
         Long clientId = 1L;
-        Long chatId = 2L;
-        String message = String.format("{\"clientId\":%d,\"text\":\"%s\",\"chat\":{\"id\":%d}}", clientId, text, chatId);
+        String chatId = "2";
+        String message = String.format("{\"clientId\":%d,\"text\":\"%s\",\"chatId\":\"%s\"}", clientId, text, chatId);
         TempMessage tempMessage = new TempMessage(USER, message);
         String json = Json.encode(tempMessage);
 

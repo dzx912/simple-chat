@@ -70,10 +70,10 @@ public class WebSocketIntegrationTest {
         WSClient client1 = new WSClient(vertx, "1");
         WSClient client2 = new WSClient(vertx, "2");
 
-        String text = "{\"clientId\":1,\"text\":\"hello\",\"chat\":{\"id\":2}}";
+        String text = "{\"clientId\":1,\"text\":\"hello\",\"chatId\":\"2\"}";
         String answerStartExpected = "{\"type\":\"text\",\"content\":{\"author\":" +
                 "{\"id\":\"1\",\"login\":\"dzx912\",\"firstName\":\"Anton\",\"lastName\":\"Lenok\"}," +
-                "\"chatId\":2,\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
+                "\"chatId\":\"2\",\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
 
         client1.setSendText(text);
         client2.setHandler(receiveText -> {

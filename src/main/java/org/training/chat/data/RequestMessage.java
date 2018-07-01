@@ -9,15 +9,15 @@ public class RequestMessage {
 
     private Long clientId;
     private String text;
-    private Chat chat;
+    private String chatId;
 
     public RequestMessage() {
     }
 
-    public RequestMessage(Long clientId, String text, Chat chat) {
+    public RequestMessage(Long clientId, String text, String chatId) {
         this.clientId = clientId;
         this.text = text;
-        this.chat = chat;
+        this.chatId = chatId;
     }
 
     public Long getClientId() {
@@ -36,12 +36,12 @@ public class RequestMessage {
         this.text = text;
     }
 
-    public Chat getChat() {
-        return chat;
+    public String getChatId() {
+        return chatId;
     }
 
-    public void setChat(Chat chat) {
-        this.chat = chat;
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 
     @Override
@@ -51,12 +51,11 @@ public class RequestMessage {
         RequestMessage that = (RequestMessage) o;
         return Objects.equals(clientId, that.clientId) &&
                 Objects.equals(text, that.text) &&
-                Objects.equals(chat, that.chat);
+                Objects.equals(chatId, that.chatId);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(clientId, text, chat);
+        return Objects.hash(clientId, text, chatId);
     }
 }

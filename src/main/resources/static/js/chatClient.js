@@ -99,8 +99,8 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
     this.send = function(text, receiverTokenText) {
         socket.send(
             '{"clientId":1,"text":"'
-            + text + '","chat":{"id":'
-            + receiverTokenText + '}}'
+            + text + '","chatId":'
+            + receiverTokenText + '}'
         );
 
         addTextMessage("Me: ", text);

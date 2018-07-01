@@ -11,7 +11,7 @@ import java.util.Objects;
 public class TextMessage {
 
     private UserDto author;
-    private Long chatId;
+    private String chatId;
     private String text;
     private Long clientId;
     private Long timestamp;
@@ -19,7 +19,7 @@ public class TextMessage {
     public TextMessage() {
     }
 
-    public TextMessage(UserDto author, Long chatId, String text, Long clientId, Long timestamp) {
+    public TextMessage(UserDto author, String chatId, String text, Long clientId, Long timestamp) {
         this.author = author;
         this.chatId = chatId;
         this.text = text;
@@ -35,11 +35,11 @@ public class TextMessage {
         this.author = author;
     }
 
-    public Long getChatId() {
+    public String getChatId() {
         return chatId;
     }
 
-    public void setChatId(Long chatId) {
+    public void setChatId(String chatId) {
         this.chatId = chatId;
     }
 

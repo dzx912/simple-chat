@@ -25,7 +25,7 @@ public class RouterVerticleTest {
 
     private Vertx vertx;
 
-    private long idChat = 3L;
+    private String idChat = "3";
     private TextMessage correctMessage;
 
     @Before

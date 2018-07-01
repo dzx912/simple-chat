@@ -59,7 +59,7 @@ public class MetadataVerticle extends AbstractVerticle {
 
         RequestMessage requestMessage = Json.decodeValue(clientMessage, RequestMessage.class);
         return new TextMessage(tempMessage.getUser(),
-                requestMessage.getChat().getId(),
+                requestMessage.getChatId(),
                 requestMessage.getText(),
                 requestMessage.getClientId(),
                 timestamp);
