@@ -26,13 +26,13 @@ import static org.training.chat.constants.BusEndpoints.DB_SAVE_MESSAGE;
 
 /**
  * Интеграционный тест, проверяющий отправку и доставку сообщений
+ * Иногда может не проходить. Для интеграционных тестов это нормально, единственное простое решение - перезапустить.
  */
 @RunWith(VertxUnitRunner.class)
-public class SendRequestMessageTest {
+public class WebSocketIntegrationTest {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
 
-
-    private final Logger logger = LogManager.getLogger(SendRequestMessageTest.class);
+    private final Logger logger = LogManager.getLogger(WebSocketIntegrationTest.class);
 
     private Vertx vertx;
 
@@ -56,7 +56,7 @@ public class SendRequestMessageTest {
     }
 
     @Test(timeout = 10_000)
-    public void testSendTextMessage(TestContext context) {
+    public void client2ShouldReceiveMessageFormClient1(TestContext context) {
         final Async async = context.async();
 
         vertx.eventBus().consumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(), (empty) -> {
