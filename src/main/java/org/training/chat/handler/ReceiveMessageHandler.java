@@ -2,15 +2,13 @@ package org.training.chat.handler;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocketFrame;
-import io.vertx.core.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.data.TempMessage;
 import org.training.chat.data.UserDto;
 
-import static org.training.chat.constants.BusEndpoints.GENERATE_COMMON_MESSAGE;
+import static org.training.chat.constants.BusEndpoints.ROUTER_METHOD;
 
 public class ReceiveMessageHandler implements Handler<WebSocketFrame> {
 
@@ -20,7 +18,7 @@ public class ReceiveMessageHandler implements Handler<WebSocketFrame> {
     private final UserDto user;
 
 
-    public ReceiveMessageHandler(Vertx vertx, ServerWebSocket wsServer, UserDto user) {
+    public ReceiveMessageHandler(Vertx vertx, UserDto user) {
         this.user = user;
         this.vertx = vertx;
     }
@@ -28,9 +26,9 @@ public class ReceiveMessageHandler implements Handler<WebSocketFrame> {
     @Override
     public void handle(WebSocketFrame webSocketFrame) {
         String message = webSocketFrame.textData();
+        logger.info("Message from user: " + message);
         TempMessage tempMessage = new TempMessage(user, message);
-        String json = Json.encode(tempMessage);
 
-        vertx.eventBus().send(GENERATE_COMMON_MESSAGE.getPath(), json);
+        vertx.eventBus().send(ROUTER_METHOD.getPath(), tempMessage);
     }
 }

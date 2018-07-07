@@ -3,18 +3,18 @@ package org.training.chat.data;
 import java.util.Objects;
 
 /**
- * POJO объект, принимающий сообщение от клиента
+ * POJO объект, принимающий текстовое сообщение от клиента
  */
-public class RequestMessage {
+public class RequestTextMessage {
 
     private Long clientId;
     private String text;
     private String chatId;
 
-    public RequestMessage() {
+    public RequestTextMessage() {
     }
 
-    public RequestMessage(Long clientId, String text, String chatId) {
+    public RequestTextMessage(Long clientId, String text, String chatId) {
         this.clientId = clientId;
         this.text = text;
         this.chatId = chatId;
@@ -48,7 +48,7 @@ public class RequestMessage {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RequestMessage that = (RequestMessage) o;
+        RequestTextMessage that = (RequestTextMessage) o;
         return Objects.equals(clientId, that.clientId) &&
                 Objects.equals(text, that.text) &&
                 Objects.equals(chatId, that.chatId);

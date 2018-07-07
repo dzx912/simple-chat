@@ -13,7 +13,6 @@ import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
-import org.training.chat.data.Chat;
 import org.training.chat.data.ResponseMessage;
 import org.training.chat.data.TextMessage;
 import org.training.chat.data.UserDto;
@@ -62,17 +61,6 @@ public class WsServerVerticle extends AbstractVerticle {
         });
     }
 
-    private void sendHistory(ServerWebSocket wsServer, String path) {
-        String token = path.substring(7);
-
-        Chat chat = new Chat(Long.valueOf(token));
-        vertx.eventBus().send(
-                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
-                chat,
-                (AsyncResult<Message<String>> result) -> answerSendHistory(wsServer, result)
-        );
-    }
-
     private void answerSendHistory(ServerWebSocket wsServer, AsyncResult<Message<String>> result) {
         String messages = result.result().body();
         String responseHistory = createResponseHistory(messages);
@@ -91,18 +79,18 @@ public class WsServerVerticle extends AbstractVerticle {
         vertx.eventBus().send(
                 VALIDATE_TOKEN.getPath(),
                 path,
-                (AsyncResult<Message<UserDto>> answer) -> validateToken(wsServer, answer, path)
+                (AsyncResult<Message<UserDto>> answer) -> validateToken(wsServer, answer)
         );
     }
 
-    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<UserDto>> answer, String path) {
+    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<UserDto>> answer) {
         if (answer.succeeded()) {
             wsServer.resume();
             UserDto user = answer.result().body();
             logger.debug("Token correct: " + user);
 
             // Подключаем обработчик WebSocket сообщений
-            wsServer.frameHandler(new ReceiveMessageHandler(vertx, wsServer, user));
+            wsServer.frameHandler(new ReceiveMessageHandler(vertx, user));
 
             eventBus.send(SEND_HISTORY.getPath(), user,
                     (AsyncResult<Message<String>> result) -> answerSendHistory(wsServer, result)

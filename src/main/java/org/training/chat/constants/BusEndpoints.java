@@ -4,10 +4,10 @@ package org.training.chat.constants;
  * Адреса EventBus
  */
 public enum BusEndpoints {
-    ROUTER("/router"),
+    ROUTER_CHAT("/router/chat"),
+    ROUTER_METHOD("/router/method"),
     TOKEN("/token/%s"),
     VALIDATE_TOKEN("/validate/token"),
-    GENERATE_COMMON_MESSAGE("/message/generate/common"),
 
     SEND_HISTORY("/message/send/history"),
 

@@ -9,12 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.codec.Codec;
-import org.training.chat.data.Chat;
-import org.training.chat.data.RequestMessage;
+import org.training.chat.data.GenericMessage;
+import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TextMessage;
 import org.training.chat.data.UserDto;
 
-import static org.training.chat.constants.BusEndpoints.ROUTER;
+import static org.training.chat.constants.BusEndpoints.ROUTER_CHAT;
 import static org.training.chat.constants.BusEndpoints.TOKEN;
 
 /**
@@ -26,23 +26,32 @@ public class RouterVerticleTest {
     private Vertx vertx;
 
     private String idChat = "3";
-    private TextMessage correctMessage;
+    private GenericMessage<RequestTextMessage> correctGenericMessage;
+    private TextMessage correctTextMessage;
 
     @Before
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
+        vertx.eventBus().registerDefaultCodec(GenericMessage.class, new Codec<>(GenericMessage.class));
         vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
 
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
 
-        correctMessage = new TextMessage(
-                new UserDto("id", "login", "firstName", "lastName"),
-                idChat,
-                "text message",
-                3L,
-                10L
+        UserDto user = new UserDto("id", "login", "firstName", "lastName");
+        String text = "text message";
+        long clientId = 3L;
+        long timestamp = 10L;
+        correctGenericMessage = new GenericMessage<>(
+                user,
+                new RequestTextMessage(
+                        clientId,
+                        text,
+                        idChat),
+                timestamp
         );
+
+        correctTextMessage = new TextMessage(user, idChat, text, clientId, timestamp);
     }
 
     @After
@@ -57,31 +66,31 @@ public class RouterVerticleTest {
         String tokenUser = String.format(TOKEN.getPath(), idChat);
 
         vertx.eventBus().localConsumer(tokenUser, receiveResult -> {
-            context.assertEquals(correctMessage, receiveResult.body());
+            context.assertEquals(correctTextMessage, receiveResult.body());
             async.complete();
         });
 
-        vertx.eventBus().send(ROUTER.getPath(), correctMessage);
+        vertx.eventBus().send(ROUTER_CHAT.getPath(), correctGenericMessage);
     }
 
-    @Test
+    @Test(timeout = 10_000)
     public void sendUncorrectedDataShouldFailed(TestContext context) {
         final Async async = context.async();
 
         String uncorrectedMessage = "uncorrected json";
 
-        vertx.eventBus().send(ROUTER.getPath(), uncorrectedMessage, answer -> {
+        vertx.eventBus().send(ROUTER_CHAT.getPath(), uncorrectedMessage, answer -> {
             context.assertTrue(answer.failed());
             context.assertEquals("Wrong data for router: " + uncorrectedMessage, answer.cause().getMessage());
             async.complete();
         });
     }
 
-    @Test
+    @Test(timeout = 10_000)
     public void sendCorrectDataShouldSuccess(TestContext context) {
         final Async async = context.async();
 
-        vertx.eventBus().send(ROUTER.getPath(), correctMessage, answer -> {
+        vertx.eventBus().send(ROUTER_CHAT.getPath(), correctGenericMessage, answer -> {
             context.assertTrue(answer.succeeded());
             async.complete();
         });

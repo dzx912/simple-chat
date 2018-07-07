@@ -1,8 +1,12 @@
 package org.training.chat.data;
 
+import io.vertx.core.json.Json;
+
+import java.util.Objects;
+
 /**
  * POJO, необходимый для передачи временных данных
- * Чтобы потом сформировать TextMessage
+ * Чтобы потом сформировать окончательное передаваемое сообщение
  */
 public class TempMessage {
 
@@ -31,5 +35,25 @@ public class TempMessage {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return Json.encode(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TempMessage that = (TempMessage) o;
+        return Objects.equals(user, that.user) &&
+                Objects.equals(message, that.message);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(user, message);
     }
 }

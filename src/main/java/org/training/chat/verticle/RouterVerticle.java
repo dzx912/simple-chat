@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.training.chat.data.GenericMessage;
+import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TextMessage;
 
 import static org.training.chat.constants.BusEndpoints.*;
@@ -17,13 +19,14 @@ public class RouterVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        vertx.eventBus().localConsumer(ROUTER.getPath(), this::router);
+        vertx.eventBus().localConsumer(ROUTER_CHAT.getPath(), this::router);
         logger.debug("Deploy " + RouterVerticle.class);
     }
 
-    private void router(Message<TextMessage> data) {
+    private void router(Message<GenericMessage<RequestTextMessage>> data) {
         try {
-            TextMessage textMessage = data.body();
+            GenericMessage<RequestTextMessage> genericMessage = data.body();
+            TextMessage textMessage = convertGenericMessageToTextMessage(genericMessage);
 
             logger.info("WebSocket textMessage: " + textMessage);
 
@@ -39,5 +42,14 @@ public class RouterVerticle extends AbstractVerticle {
             logger.warn(errorMessage);
             data.fail(-1, errorMessage);
         }
+    }
+
+    private TextMessage convertGenericMessageToTextMessage(GenericMessage<RequestTextMessage> tempMessage) {
+        RequestTextMessage requestTextMessage = tempMessage.getMessage();
+        return new TextMessage(tempMessage.getAuthor(),
+                requestTextMessage.getChatId(),
+                requestTextMessage.getText(),
+                requestTextMessage.getClientId(),
+                tempMessage.getTimestamp());
     }
 }

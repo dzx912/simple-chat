@@ -1,5 +1,6 @@
 package org.training.chat.data;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -8,11 +9,14 @@ import java.util.Objects;
 public class Chat {
     private Long id;
 
+    private List<UserDto> users;
+
     public Chat() {
     }
 
-    public Chat(Long id) {
+    public Chat(Long id, List<UserDto> users) {
         this.id = id;
+        this.users = users;
     }
 
     public Long getId() {
@@ -21,6 +25,14 @@ public class Chat {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<UserDto> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserDto> users) {
+        this.users = users;
     }
 
     @Override

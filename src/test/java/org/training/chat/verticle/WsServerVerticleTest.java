@@ -17,7 +17,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.codec.Codec;
 import org.training.chat.constants.ServerOption;
-import org.training.chat.data.*;
+import org.training.chat.data.Chat;
+import org.training.chat.data.TempMessage;
+import org.training.chat.data.TextMessage;
+import org.training.chat.data.UserDto;
 
 import static org.training.chat.constants.BusEndpoints.*;
 
@@ -38,6 +41,7 @@ public class WsServerVerticleTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
+        vertx.eventBus().registerDefaultCodec(TempMessage.class, new Codec<>(TempMessage.class));
         vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
         vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
@@ -70,10 +74,9 @@ public class WsServerVerticleTest {
 
         String token = "1";
         TempMessage tempMessage = new TempMessage(USER, CHECK_TEXT);
-        String json = Json.encode(tempMessage);
 
-        vertx.eventBus().localConsumer(GENERATE_COMMON_MESSAGE.getPath(), receiveResult -> {
-            context.assertEquals(json, receiveResult.body());
+        vertx.eventBus().localConsumer(ROUTER_METHOD.getPath(), receiveResult -> {
+            context.assertEquals(tempMessage, receiveResult.body());
             async.complete();
         });
 
@@ -89,8 +92,6 @@ public class WsServerVerticleTest {
 
         String idChat = "2";
 
-        RequestMessage requestMessage =
-                new RequestMessage(2L, "text message", idChat);
         TextMessage correctMessage = new TextMessage(
                 new UserDto("id", "login", "firstName", "lastName"),
                 "2",

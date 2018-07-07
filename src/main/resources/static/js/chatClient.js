@@ -98,14 +98,17 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
 
     this.send = function(textMessage, receiverToken) {
         var json = JSON.stringify({
-          clientId: 1,
-          text: textMessage,
-          chatId: receiverToken
+            method: "sendTextMessage",
+            content: {
+                clientId: 1,
+                text: textMessage,
+                chatId: receiverToken
+            }
         });
 
         socket.send(json);
 
-        addTextMessage("Me: ", text);
+        addTextMessage("Me: ", textMessage);
 
         clearInput();
     }
