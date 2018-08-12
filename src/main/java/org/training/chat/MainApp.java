@@ -30,6 +30,8 @@ public class MainApp {
         vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
         vertx.eventBus().registerDefaultCodec(RequestTextMessage.class, new Codec<>(RequestTextMessage.class));
         vertx.eventBus().registerDefaultCodec(GenericMessage.class, new Codec<>(GenericMessage.class));
+        vertx.eventBus().registerDefaultCodec(RequestCreateChat.class, new Codec<>(RequestCreateChat.class));
+        vertx.eventBus().registerDefaultCodec(ResponseCreateChat.class, new Codec<>(ResponseCreateChat.class));
     }
 
     private static void deploy(Vertx vertx) {
@@ -39,5 +41,6 @@ public class MainApp {
         vertx.deployVerticle(new RouterVerticle());
         vertx.deployVerticle(new RestServerVerticle());
         vertx.deployVerticle(new ValidateTokenVerticle());
+        vertx.deployVerticle(new ChatVerticle());
     }
 }

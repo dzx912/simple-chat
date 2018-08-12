@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.BusEndpoints;
 import org.training.chat.constants.WsMethod;
 import org.training.chat.data.GenericMessage;
+import org.training.chat.data.RequestCreateChat;
 import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TempMessage;
 
@@ -25,17 +26,18 @@ import static org.training.chat.constants.BusEndpoints.*;
  */
 public class MethodRouterVerticle extends AbstractVerticle {
     private static final String WEB_SOCKET_CLOSE = "\u0003�";
-    private final Logger logger = LogManager.getLogger(MethodRouterVerticle.class);
-
     private static final EnumMap<WsMethod, BusEndpoints> WS_METHODS = new EnumMap<>(WsMethod.class);
     private static final EnumMap<WsMethod, Class> WS_METHODS_TO_CLASS = new EnumMap<>(WsMethod.class);
 
     static {
         WS_METHODS.put(WsMethod.sendTextMessage, ROUTER_CHAT);
-        WS_METHODS.put(WsMethod.createChat, DB_CHAT_CREATE);
+        WS_METHODS.put(WsMethod.createChat, CHAT_CREATE);
 
         WS_METHODS_TO_CLASS.put(WsMethod.sendTextMessage, RequestTextMessage.class);
+        WS_METHODS_TO_CLASS.put(WsMethod.createChat, RequestCreateChat.class);
     }
+
+    private final Logger logger = LogManager.getLogger(MethodRouterVerticle.class);
 
     @Override
     public void start() {
@@ -45,6 +47,7 @@ public class MethodRouterVerticle extends AbstractVerticle {
 
     private void routeMethod(Message<TempMessage> data) {
         TempMessage tempMessage = data.body();
+        logger.info("Get message: {}", tempMessage);
         try {
             String clientMessage = tempMessage.getMessage();
             JsonObject json = new JsonObject(clientMessage);
@@ -53,7 +56,9 @@ public class MethodRouterVerticle extends AbstractVerticle {
             if (!webSocketIsClosed) {
                 String method = json.getString("method");
                 String path = getPath(method);
-                GenericMessage genericMessage = createGenericMessage(tempMessage, json, method);
+                GenericMessage<?> genericMessage = createGenericMessage(tempMessage, json, method);
+
+                logger.info("Path: {}, message: {}", path, genericMessage);
                 vertx.eventBus().send(path, genericMessage);
                 data.reply("ok");
             } else {
@@ -75,7 +80,7 @@ public class MethodRouterVerticle extends AbstractVerticle {
         return WS_METHODS_TO_CLASS.get(wsMethod);
     }
 
-    private GenericMessage createGenericMessage(TempMessage tempMessage, JsonObject json, String method) {
+    private GenericMessage<?> createGenericMessage(TempMessage tempMessage, JsonObject json, String method) {
         JsonObject content = json.getJsonObject("content");
         String message = content.encode();
         Class requestClass = getRequestClass(method);

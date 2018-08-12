@@ -14,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
 import org.training.chat.data.ResponseMessage;
-import org.training.chat.data.TextMessage;
 import org.training.chat.data.UserDto;
 import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
@@ -42,6 +41,15 @@ public class WsServerVerticle extends AbstractVerticle {
         eventBus.localConsumer(SEND_HISTORY.getPath(), this::sendHistoryToUser);
     }
 
+    private void sendHistoryToUser(Message<UserDto> data) {
+        UserDto user = data.body();
+        vertx.eventBus().send(
+                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
+                user,
+                answer -> data.reply(answer.result().body())
+        );
+    }
+
     private void createWebSocketServer(ServerWebSocket wsServer) {
 
         // Извлекаем из WebSocket подключение адрес, обычно мы здесь посылаем токен
@@ -51,7 +59,7 @@ public class WsServerVerticle extends AbstractVerticle {
         validateConnection(wsServer, path);
 
         // Делаем обработчик события, что кто-то хочет написать в этот WebSocket
-        MessageConsumer<TextMessage> consumerSendMessage =
+        MessageConsumer<String> consumerSendMessage =
                 eventBus.localConsumer(path, new SendMessageHandler(wsServer));
 
         // Снимаем обработчик, после закрытия WebSocket'а
@@ -59,19 +67,6 @@ public class WsServerVerticle extends AbstractVerticle {
             consumerSendMessage.unregister();
             logger.info("Close connect with: " + path);
         });
-    }
-
-    private void answerSendHistory(ServerWebSocket wsServer, AsyncResult<Message<String>> result) {
-        String messages = result.result().body();
-        String responseHistory = createResponseHistory(messages);
-        wsServer.writeFinalTextFrame(responseHistory);
-    }
-
-    private String createResponseHistory(String messages) {
-        JsonArray jsonMessages = new JsonArray(messages);
-        JsonObject history = new JsonObject().put("history", jsonMessages);
-        ResponseMessage response = new ResponseMessage("history", history);
-        return Json.encode(response);
     }
 
     private void validateConnection(ServerWebSocket wsServer, String path) {
@@ -102,13 +97,18 @@ public class WsServerVerticle extends AbstractVerticle {
         }
     }
 
-    private void sendHistoryToUser(Message<UserDto> data) {
-        UserDto user = data.body();
-        vertx.eventBus().send(
-                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
-                user,
-                answer -> data.reply(answer.result().body())
-        );
+    private void answerSendHistory(ServerWebSocket wsServer, AsyncResult<Message<String>> result) {
+        String messages = result.result().body();
+        String responseHistory = createResponseHistory(messages);
+        wsServer.writeFinalTextFrame(responseHistory);
     }
+
+    private String createResponseHistory(String messages) {
+        JsonArray jsonMessages = new JsonArray(messages);
+        JsonObject history = new JsonObject().put("history", jsonMessages);
+        ResponseMessage response = new ResponseMessage("history", history);
+        return Json.encode(response);
+    }
+
 
 }

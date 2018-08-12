@@ -1,5 +1,7 @@
 package org.training.chat.data;
 
+import io.vertx.core.json.Json;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -7,23 +9,23 @@ import java.util.Objects;
  * DTO для работы с сущностью чата переписки
  */
 public class Chat {
-    private Long id;
+    private String id;
 
     private List<UserDto> users;
 
     public Chat() {
     }
 
-    public Chat(Long id, List<UserDto> users) {
+    public Chat(String id, List<UserDto> users) {
         this.id = id;
         this.users = users;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -33,6 +35,11 @@ public class Chat {
 
     public void setUsers(List<UserDto> users) {
         this.users = users;
+    }
+
+    @Override
+    public String toString() {
+        return Json.encode(this);
     }
 
     @Override

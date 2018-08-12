@@ -4,15 +4,18 @@ document.addEventListener("DOMContentLoaded", function() {
     var outputTextMessage = document.getElementById("outputMessage");
 
     var buttonLogout = document.getElementById("buttonLogout");
-    var receiverToken = document.getElementById("receiverToken");
 
     var registrationPanel = document.getElementById("registrationPanel");
+    var openChatPanel = document.getElementById("openChatPanel");
     var chatPanel = document.getElementById("chatPanel");
+
     var buttonSignUp = document.getElementById("buttonSignUp");
     var inputLogin = document.getElementById("inputLogin");
     var inputFirstName = document.getElementById("inputFirstName");
     var inputLastName = document.getElementById("inputLastName");
     var tokenOutput = document.getElementById("tokenOutput");
+
+    var inputLoginReceiver = document.getElementById("inputLoginReceiver");
 
     buttonSignUp.addEventListener("click", onSignUp);
 
@@ -20,8 +23,13 @@ document.addEventListener("DOMContentLoaded", function() {
     buttonSend.addEventListener("click", sendMessage);
     inputTextMessage.addEventListener("keypress", onEnterInputTextMessage);
 
+    buttonOpenChat.addEventListener("click", openChat);
+    inputLoginReceiver.addEventListener("keypress", onEnterInputLoginReceiver);
+
+    buttonCloseChat.addEventListener("click", closeChat);
+
     var chatStorage = new ChatStorage();
-    var chatClient = new ChatClient(outputTextMessage, init, clearInput, chatStorage.clearToken);
+    var chatClient = new ChatClient(outputTextMessage, init, clearInput, showChatPanel, chatStorage.clearToken);
     var registration = new Registration(responseRegistration);
 
     init();
@@ -31,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if(token) {
             chatClient.connect(token);
             tokenOutput.innerHTML = token;
-            showPanels('chat');
+            showPanels('openChat');
         } else {
             tokenOutput.innerHTML = '';
             showPanels('registration')
@@ -46,17 +54,26 @@ document.addEventListener("DOMContentLoaded", function() {
         chatStorage.saveChatToken(token);
         chatClient.connect(token);
         tokenOutput.innerHTML = token;
-        showPanels('chat');
+        showPanels('openChat');
+    }
+
+    function showChatPanel() {
+        showPanels("chat");
     }
 
     function showPanels(panel) {
+        registrationPanel.style.display="none";
+        openChatPanel.style.display="none";
+        chatPanel.style.display="none";
+
         if(panel === 'chat') {
-            registrationPanel.style.display="none";
             chatPanel.style.display="block";
+        }
+        if(panel === 'openChat') {
+            openChatPanel.style.display="block";
         }
         if(panel === 'registration') {
             registrationPanel.style.display="block";
-            chatPanel.style.display="none";
         }
     }
 
@@ -72,13 +89,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function sendMessage() {
         var text = inputTextMessage.value;
-        var receiverTokenText = receiverToken.value;
-        if(text && receiverTokenText) {
-            chatClient.send(text, receiverTokenText)
+        if(text) {
+            chatClient.send(text)
         }
     }
 
     function onLogout() {
         chatClient.logout();
+    }
+
+    function onEnterInputLoginReceiver(event) {
+        if (event.keyCode == 13) {
+            openChat();
+        }
+    }
+
+    function openChat() {
+        var loginReceiver = inputLoginReceiver.value;
+        if(loginReceiver) {
+            chatClient.createChat(loginReceiver);
+        }
+    }
+
+    function closeChat() {
+        showPanels('openChat');
+        chatClient.closeChat();
     }
 });

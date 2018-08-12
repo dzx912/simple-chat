@@ -13,6 +13,7 @@ import org.training.chat.data.GenericMessage;
 import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TextMessage;
 import org.training.chat.data.UserDto;
+import org.training.chat.util.Answerer;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER_CHAT;
 import static org.training.chat.constants.BusEndpoints.TOKEN;
@@ -27,7 +28,7 @@ public class RouterVerticleTest {
 
     private String idChat = "3";
     private GenericMessage<RequestTextMessage> correctGenericMessage;
-    private TextMessage correctTextMessage;
+    private String correctTextMessage;
 
     @Before
     public void setUp(TestContext context) {
@@ -51,7 +52,8 @@ public class RouterVerticleTest {
                 timestamp
         );
 
-        correctTextMessage = new TextMessage(user, idChat, text, clientId, timestamp);
+        TextMessage textMessage = new TextMessage(user, idChat, text, clientId, timestamp);
+        correctTextMessage = Answerer.createResponseMessage("text", textMessage);
     }
 
     @After

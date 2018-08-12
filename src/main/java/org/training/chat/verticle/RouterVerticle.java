@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.training.chat.data.GenericMessage;
 import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TextMessage;
+import org.training.chat.util.Answerer;
 
 import static org.training.chat.constants.BusEndpoints.*;
 
@@ -30,10 +31,12 @@ public class RouterVerticle extends AbstractVerticle {
 
             logger.info("WebSocket textMessage: " + textMessage);
 
-            String token = String.format(TOKEN.getPath(), textMessage.getChatId());
-            logger.info("Receiver token: " + token);
+            String chatPath = String.format(CHAT.getPath(), textMessage.getChatId());
+            logger.info("Send to chat: " + chatPath);
 
-            vertx.eventBus().send(token, textMessage);
+            String messageToClient = Answerer.createResponseMessage("text", textMessage);
+
+            vertx.eventBus().send(chatPath, messageToClient);
             vertx.eventBus().send(DB_SAVE_MESSAGE.getPath(), textMessage);
 
             data.reply("ok");

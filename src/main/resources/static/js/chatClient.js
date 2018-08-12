@@ -1,6 +1,7 @@
-function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken) {
+function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPanel, callbackClearToken) {
     var socket;
     var outputTextMessage = output;
+    var chatId;
     this.callbackInit = callbackInit;
 
     function init() {
@@ -13,6 +14,10 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
 
     function clearToken() {
         checkAndRun(callbackClearToken);
+    }
+
+    function showChatPanel() {
+        checkAndRun(callbackShowChatPanel);
     }
 
     function checkAndRun(func) {
@@ -53,8 +58,22 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
             case "text":
                 showMessage(json.content);
                 break;
+            case "ack":
+                acknowledge(json);
+                break;
             default:
-                console.log("Неизвестный тип сообщения");
+                console.log("Неизвестный тип сообщения: " + json);
+                break;
+        }
+    }
+
+    function acknowledge(json) {
+        switch (json.method) {
+            case "createChat":
+                acknowledgeCreateChat(json);
+                break;
+            default:
+                console.log("Неизвестный метод acknowledge: " + json);
                 break;
         }
     }
@@ -96,13 +115,13 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
         init();
     }
 
-    this.send = function(textMessage, receiverToken) {
+    this.send = function(textMessage) {
         var json = JSON.stringify({
             method: "sendTextMessage",
             content: {
                 clientId: 1,
                 text: textMessage,
-                chatId: receiverToken
+                chatId: chatId
             }
         });
 
@@ -117,5 +136,25 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackClearToken
         var oldText = outputTextMessage.value;
 
         outputTextMessage.value = author + message + "\n" + oldText;
+    }
+
+    this.createChat = function(loginReceiver) {
+        var json = JSON.stringify({
+            method: "createChat",
+            content: {
+                loginReceiver: loginReceiver
+            }
+        });
+
+        socket.send(json);
+    }
+
+    function acknowledgeCreateChat(json) {
+        chatId = json.content.chat.id;
+        showChatPanel();
+    }
+
+    this.closeChat = function() {
+        chatId = null;
     }
 }
