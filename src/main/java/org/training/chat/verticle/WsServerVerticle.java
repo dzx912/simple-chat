@@ -7,18 +7,14 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
-import org.training.chat.data.ResponseMessage;
 import org.training.chat.data.UserDto;
 import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
 
-import static org.training.chat.constants.BusEndpoints.*;
+import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
 
 /**
  * Actor, обслуживающий WebSocket соединение
@@ -38,16 +34,7 @@ public class WsServerVerticle extends AbstractVerticle {
         httpServer.listen(ServerOption.getWsPort());
         logger.debug("Deploy " + WsServerVerticle.class);
 
-        eventBus.localConsumer(SEND_HISTORY.getPath(), this::sendHistoryToUser);
-    }
 
-    private void sendHistoryToUser(Message<UserDto> data) {
-        UserDto user = data.body();
-        vertx.eventBus().send(
-                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
-                user,
-                answer -> data.reply(answer.result().body())
-        );
     }
 
     private void createWebSocketServer(ServerWebSocket wsServer) {
@@ -85,28 +72,11 @@ public class WsServerVerticle extends AbstractVerticle {
 
             // Подключаем обработчик WebSocket сообщений
             wsServer.frameHandler(new ReceiveMessageHandler(vertx, user));
-
-            eventBus.send(SEND_HISTORY.getPath(), user,
-                    (AsyncResult<Message<String>> result) -> answerSendHistory(wsServer, result)
-            );
         } else {
             String errorMessage = answer.cause().getMessage();
             logger.warn(errorMessage);
             wsServer.close((short) -1, errorMessage);
         }
-    }
-
-    private void answerSendHistory(ServerWebSocket wsServer, AsyncResult<Message<String>> result) {
-        String messages = result.result().body();
-        String responseHistory = createResponseHistory(messages);
-        wsServer.writeFinalTextFrame(responseHistory);
-    }
-
-    private String createResponseHistory(String messages) {
-        JsonArray jsonMessages = new JsonArray(messages);
-        JsonObject history = new JsonObject().put("history", jsonMessages);
-        ResponseMessage response = new ResponseMessage("history", history);
-        return Json.encode(response);
     }
 
 

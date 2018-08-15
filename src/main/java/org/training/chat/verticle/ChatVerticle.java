@@ -3,6 +3,9 @@ package org.training.chat.verticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.data.*;
@@ -21,6 +24,7 @@ public class ChatVerticle extends AbstractVerticle {
     public void start() {
         vertx.eventBus().localConsumer(CHAT_CREATE.getPath(), this::chatCreate);
         vertx.eventBus().localConsumer(CHAT_ACKNOWLEDGE.getPath(), this::chatAcknowledge);
+        vertx.eventBus().localConsumer(CHAT_GET_HISTORY.getPath(), this::chatGetHistory);
     }
 
     private void chatAcknowledge(Message<ResponseCreateChat> data) {
@@ -42,9 +46,27 @@ public class ChatVerticle extends AbstractVerticle {
                 vertx.eventBus().localConsumer(pathChat, messageToDevice ->
                         vertx.eventBus().send(pathDevice, messageToDevice.body())
                 );
+
+                vertx.eventBus().send(CHAT_GET_HISTORY.getPath(), responseCreateChat.getChat(),
+                        (AsyncResult<Message<String>> result) -> answerSendHistory(pathDevice, result)
+                );
             }
         });
     }
+
+    private void answerSendHistory(String pathDevice, AsyncResult<Message<String>> result) {
+        String messages = result.result().body();
+        String responseHistory = createResponseHistory(messages);
+        vertx.eventBus().send(pathDevice, responseHistory);
+    }
+
+    private String createResponseHistory(String messages) {
+        JsonArray jsonMessages = new JsonArray(messages);
+        JsonObject history = new JsonObject().put("history", jsonMessages);
+        ResponseMessage response = new ResponseMessage("history", history);
+        return Json.encode(response);
+    }
+
 
     private void chatCreate(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> request = data.body();
@@ -73,5 +95,14 @@ public class ChatVerticle extends AbstractVerticle {
         } else {
             logger.warn("Chat is not created: {}", res.cause().getMessage());
         }
+    }
+
+    private void chatGetHistory(Message<Chat> data) {
+        Chat chat = data.body();
+        vertx.eventBus().send(
+                DB_LOAD_MESSAGES_BY_CHAT.getPath(),
+                chat,
+                answer -> data.reply(answer.result().body())
+        );
     }
 }

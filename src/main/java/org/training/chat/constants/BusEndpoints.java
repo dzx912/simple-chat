@@ -13,7 +13,7 @@ public enum BusEndpoints {
     CHAT_CREATE("/chat/create"),
     CHAT_ACKNOWLEDGE("/chat/acknowledge"),
 
-    SEND_HISTORY("/message/send/history"),
+    CHAT_GET_HISTORY("/chat/get/history"),
 
     DB_SAVE_MESSAGE("db/save/message"),
     DB_LOAD_MESSAGES_BY_CHAT("db/load/messages/by/chat"),
