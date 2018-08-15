@@ -34,7 +34,6 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
         socket.addEventListener('error', wsError);
 
         clearHistory();
-        addTextMessage("SERVER: ", "Connect");
     }
 
     function clearHistory() {
@@ -156,5 +155,6 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
 
     this.closeChat = function() {
         chatId = null;
+        clearHistory();
     }
 }
