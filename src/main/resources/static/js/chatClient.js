@@ -34,7 +34,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
         socket.addEventListener('error', wsError);
 
         clearHistory();
-        addTextMessage("SERVER: ", "Connect like " + token);
+        addTextMessage("SERVER: ", "Connect");
     }
 
     function clearHistory() {

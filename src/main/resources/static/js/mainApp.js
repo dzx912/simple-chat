@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var inputLogin = document.getElementById("inputLogin");
     var inputFirstName = document.getElementById("inputFirstName");
     var inputLastName = document.getElementById("inputLastName");
-    var tokenOutput = document.getElementById("tokenOutput");
 
     var inputLoginReceiver = document.getElementById("inputLoginReceiver");
 
@@ -38,10 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
         var token = chatStorage.getChatToken()
         if(token) {
             chatClient.connect(token);
-            tokenOutput.innerHTML = token;
             showPanels('openChat');
         } else {
-            tokenOutput.innerHTML = '';
             showPanels('registration')
         }
     }
@@ -53,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
     function responseRegistration(token) {
         chatStorage.saveChatToken(token);
         chatClient.connect(token);
-        tokenOutput.innerHTML = token;
         showPanels('openChat');
     }
 
