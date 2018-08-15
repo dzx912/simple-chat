@@ -49,7 +49,6 @@ public class ChatVerticle extends AbstractVerticle {
     private void chatCreate(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> request = data.body();
         logger.info("Get message: {}", request);
-        RequestCreateChat createdChat = request.getMessage();
         vertx.eventBus().send(DB_CHAT_FIND_BY_LOGIN.getPath(), request, (AsyncResult<Message<Chat>> res) -> {
             if (res.succeeded()) {
                 Chat chat = res.result().body();

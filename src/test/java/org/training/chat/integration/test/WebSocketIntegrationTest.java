@@ -15,9 +15,9 @@ import org.training.chat.data.*;
 import org.training.chat.integration.client.WSClient;
 import org.training.chat.verticle.*;
 
-import static org.training.chat.constants.BusEndpoints.DB_FIND_USER;
-import static org.training.chat.constants.BusEndpoints.DB_LOAD_MESSAGES_BY_CHAT;
-import static org.training.chat.constants.BusEndpoints.DB_SAVE_MESSAGE;
+import java.util.Collections;
+
+import static org.training.chat.constants.BusEndpoints.*;
 
 /**
  * Интеграционный тест, проверяющий отправку и доставку сообщений
@@ -26,6 +26,9 @@ import static org.training.chat.constants.BusEndpoints.DB_SAVE_MESSAGE;
 @RunWith(VertxUnitRunner.class)
 public class WebSocketIntegrationTest {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
+    private final static String RESPONSE_ACKNOWLEDGE = "{\"type\":\"ack\"";
+
+    private final static String CHAT_ID = "3";
 
     private final Logger logger = LogManager.getLogger(WebSocketIntegrationTest.class);
 
@@ -40,11 +43,13 @@ public class WebSocketIntegrationTest {
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
         vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
         vertx.eventBus().registerDefaultCodec(GenericMessage.class, new Codec<>(GenericMessage.class));
+        vertx.eventBus().registerDefaultCodec(ResponseCreateChat.class, new Codec<>(ResponseCreateChat.class));
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
         vertx.deployVerticle(ValidateTokenVerticle.class.getName(), context.asyncAssertSuccess());
         vertx.deployVerticle(MethodRouterVerticle.class.getName(), context.asyncAssertSuccess());
+        vertx.deployVerticle(ChatVerticle.class.getName(), context.asyncAssertSuccess());
     }
 
     @After
@@ -52,8 +57,8 @@ public class WebSocketIntegrationTest {
         vertx.close(context.asyncAssertSuccess());
     }
 
-    @Test(timeout = 10_000)
-    public void client2ShouldReceiveMessageFormClient1(TestContext context) {
+    @Test//(timeout = 10_000)
+    public void receiverShouldGetMessageFormSender(TestContext context) {
         final Async async = context.async();
 
         vertx.eventBus().consumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(), (empty) -> {
@@ -61,33 +66,48 @@ public class WebSocketIntegrationTest {
         vertx.eventBus().consumer(DB_SAVE_MESSAGE.getPath(), (empty) -> {
         });
         vertx.eventBus().consumer(DB_FIND_USER.getPath(), (data) ->
-            data.reply(new UserDto("1", "dzx912", "Anton", "Lenok"))
+                data.reply(new UserDto("1", "dzx912", "Anton", "Lenok"))
+        );
+        vertx.eventBus().consumer(DB_CHAT_FIND_BY_LOGIN.getPath(), (data) ->
+                data.reply(new Chat(CHAT_ID, Collections.emptyList()))
+        );
+        vertx.eventBus().consumer(DB_FIND_TOKEN_BY_USER.getPath(), (data) ->
+                data.reply("2")
         );
 
-        WSClient client1 = new WSClient(vertx, "1");
-        WSClient client2 = new WSClient(vertx, "2");
+        WSClient sender1 = new WSClient(vertx, "1");
+        WSClient sender2 = new WSClient(vertx, "1");
+        WSClient receiver = new WSClient(vertx, "2");
 
-        String text = "{\"method\":\"sendTextMessage\",\"content\":{\"clientId\":1,\"text\":\"hello\",\"chatId\":\"2\"}}";
+        String createChat = "{\"method\":\"createChat\",\"content\":{\"loginReceiver\":\"receiverLogin\"}}";
+        String text = "{\"method\":\"sendTextMessage\",\"content\":{\"clientId\":1,\"text\":\"hello\",\"chatId\":\"" + CHAT_ID + "\"}}";
         String answerStartExpected = "{\"type\":\"text\",\"content\":{\"author\":" +
                 "{\"id\":\"1\",\"login\":\"dzx912\",\"firstName\":\"Anton\",\"lastName\":\"Lenok\"}," +
-                "\"chatId\":\"2\",\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
+                "\"chatId\":\"" + CHAT_ID + "\",\"text\":\"hello\",\"clientId\":1,\"timestamp\":";
 
-        client1.setSendText(text);
-        client2.setHandler(receiveText -> {
+        sender1.setSendText(createChat);
+
+        receiver.setHandler(receiveText -> {
             logger.info("Receive text: " + receiveText);
             boolean isCloseWebSocket = WEB_SOCKET_CLOSE.equals(receiveText);
-            if (!isCloseWebSocket) {
+            boolean isResponseAcknowledge = receiveText.startsWith(RESPONSE_ACKNOWLEDGE);
+            if (isResponseAcknowledge) {
+                sender1.close();
+                sender2.setSendText(text);
+                sender2.run();
+            }
+            if (!isCloseWebSocket && !isResponseAcknowledge) {
                 context.assertEquals(answerStartExpected,
                         receiveText.substring(0, answerStartExpected.length()));
 
-                client2.close();
-                client1.close();
+                receiver.close();
+                sender2.close();
 
                 async.complete();
             }
         });
 
-        client1.run();
-        client2.run();
+        sender1.run();
+        receiver.run();
     }
 }

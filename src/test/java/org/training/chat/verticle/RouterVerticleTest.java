@@ -15,8 +15,8 @@ import org.training.chat.data.TextMessage;
 import org.training.chat.data.UserDto;
 import org.training.chat.util.Answerer;
 
+import static org.training.chat.constants.BusEndpoints.CHAT;
 import static org.training.chat.constants.BusEndpoints.ROUTER_CHAT;
-import static org.training.chat.constants.BusEndpoints.TOKEN;
 
 /**
  * Unit test for actor Router
@@ -65,9 +65,9 @@ public class RouterVerticleTest {
     public void routerShouldSendCorrectData(TestContext context) {
         final Async async = context.async();
 
-        String tokenUser = String.format(TOKEN.getPath(), idChat);
+        String pathChat = String.format(CHAT.getPath(), idChat);
 
-        vertx.eventBus().localConsumer(tokenUser, receiveResult -> {
+        vertx.eventBus().localConsumer(pathChat, receiveResult -> {
             context.assertEquals(correctTextMessage, receiveResult.body());
             async.complete();
         });

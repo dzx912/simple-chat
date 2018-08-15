@@ -51,7 +51,6 @@ public class WsServerVerticle extends AbstractVerticle {
     }
 
     private void createWebSocketServer(ServerWebSocket wsServer) {
-
         // Извлекаем из WebSocket подключение адрес, обычно мы здесь посылаем токен
         String path = wsServer.path();
         logger.info("Create WebSocket server with path: " + path);
