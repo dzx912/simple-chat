@@ -6,7 +6,7 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 targetCompatibility = 15
 def versionVertx = '3.5.3'
-def versionLog4j = '2.11.0'
+def versionLog4j = '2.17.1'
 def mainClass = 'org.training.chat.MainApp'
 
 repositories {
