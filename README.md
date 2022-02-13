@@ -4,7 +4,7 @@ Lightweight chat by Java Vert.x
 
 ## Compile
 
-`gradle clean test fatJar`
+`gradle clean build`
 
 ## Prepare run
 
