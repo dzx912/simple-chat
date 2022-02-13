@@ -27,6 +27,35 @@ public class ChatVerticle extends AbstractVerticle {
         vertx.eventBus().localConsumer(CHAT_GET_HISTORY.getPath(), this::chatGetHistory);
     }
 
+    private void chatCreate(Message<GenericMessage<RequestCreateChat>> data) {
+        GenericMessage<RequestCreateChat> request = data.body();
+        logger.info("Get message: {}", request);
+        vertx.eventBus().send(DB_CHAT_FIND_BY_LOGIN.getPath(), request, (AsyncResult<Message<Chat>> res) -> {
+            if (res.succeeded()) {
+                Chat chat = res.result().body();
+                ResponseCreateChat responseCreateChat = new ResponseCreateChat(request.getAuthor(), chat);
+                logger.info("Find chat by login: {}", responseCreateChat);
+                vertx.eventBus().send(CHAT_ACKNOWLEDGE.getPath(), responseCreateChat);
+            } else {
+                logger.info("Try create chat: {}", request);
+                vertx.eventBus().send(DB_CHAT_CREATE_BY_LOGIN.getPath(), request,
+                        (AsyncResult<Message<Chat>> resCreating) -> acknowledge(resCreating, request.getAuthor()));
+            }
+        });
+        data.reply("ok");
+    }
+
+    private void acknowledge(AsyncResult<Message<Chat>> res, UserDto author) {
+        if (res.succeeded()) {
+            Chat chat = res.result().body();
+            ResponseCreateChat responseCreateChat = new ResponseCreateChat(author, chat);
+            logger.info("Chat is created: {}", responseCreateChat);
+            vertx.eventBus().send(CHAT_ACKNOWLEDGE.getPath(), responseCreateChat);
+        } else {
+            logger.warn("Chat is not created: {}", res.cause().getMessage());
+        }
+    }
+
     private void chatAcknowledge(Message<ResponseCreateChat> data) {
         ResponseCreateChat responseCreateChat = data.body();
         UserDto user = responseCreateChat.getAuthor();
@@ -65,36 +94,6 @@ public class ChatVerticle extends AbstractVerticle {
         JsonObject history = new JsonObject().put("history", jsonMessages);
         ResponseMessage response = new ResponseMessage("history", history);
         return Json.encode(response);
-    }
-
-
-    private void chatCreate(Message<GenericMessage<RequestCreateChat>> data) {
-        GenericMessage<RequestCreateChat> request = data.body();
-        logger.info("Get message: {}", request);
-        vertx.eventBus().send(DB_CHAT_FIND_BY_LOGIN.getPath(), request, (AsyncResult<Message<Chat>> res) -> {
-            if (res.succeeded()) {
-                Chat chat = res.result().body();
-                ResponseCreateChat responseCreateChat = new ResponseCreateChat(request.getAuthor(), chat);
-                logger.info("Find chat by login: {}", responseCreateChat);
-                vertx.eventBus().send(CHAT_ACKNOWLEDGE.getPath(), responseCreateChat);
-            } else {
-                logger.info("Try create chat: {}", request);
-                vertx.eventBus().send(DB_CHAT_CREATE_BY_LOGIN.getPath(), request,
-                        (AsyncResult<Message<Chat>> resCreating) -> acknowledge(resCreating, request.getAuthor()));
-            }
-        });
-        data.reply("ok");
-    }
-
-    private void acknowledge(AsyncResult<Message<Chat>> res, UserDto author) {
-        if (res.succeeded()) {
-            Chat chat = res.result().body();
-            ResponseCreateChat responseCreateChat = new ResponseCreateChat(author, chat);
-            logger.info("Chat is created: {}", responseCreateChat);
-            vertx.eventBus().send(CHAT_ACKNOWLEDGE.getPath(), responseCreateChat);
-        } else {
-            logger.warn("Chat is not created: {}", res.cause().getMessage());
-        }
     }
 
     private void chatGetHistory(Message<Chat> data) {

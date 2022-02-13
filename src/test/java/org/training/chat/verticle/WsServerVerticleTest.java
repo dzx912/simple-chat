@@ -127,17 +127,6 @@ public class WsServerVerticleTest {
         }
     }
 
-    @Test(timeout = 10_000)
-    public void afterOpenWsShouldGetHistory(TestContext context) {
-        final Async async = context.async();
-
-        RequestOptions options = getWSRequestOptions("3");
-
-        vertx.createHttpClient().websocketStream(options).handler(
-                ws -> ws.frameHandler(wsf -> checkHistory(context, async, wsf)
-                ));
-    }
-
     private void checkHistory(TestContext context, Async async, WebSocketFrame wsf) {
         String message = wsf.textData();
         boolean isCloseText = WEB_SOCKET_CLOSE.equals(message);
