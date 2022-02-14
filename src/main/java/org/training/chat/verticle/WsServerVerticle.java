@@ -30,7 +30,7 @@ public class WsServerVerticle extends AbstractVerticle {
         eventBus = vertx.eventBus();
 
         HttpServer httpServer = vertx.createHttpServer();
-        httpServer.websocketHandler(this::createWebSocketServer);
+        httpServer.webSocketHandler(this::createWebSocketServer);
         httpServer.listen(ServerOption.getWsPort());
         logger.debug("Deploy " + WsServerVerticle.class);
 
@@ -57,7 +57,7 @@ public class WsServerVerticle extends AbstractVerticle {
 
     private void validateConnection(ServerWebSocket wsServer, String path) {
         wsServer.pause();
-        vertx.eventBus().send(
+        vertx.eventBus().request(
                 VALIDATE_TOKEN.getPath(),
                 path,
                 (AsyncResult<Message<UserDto>> answer) -> validateToken(wsServer, answer)

@@ -81,7 +81,7 @@ public class RouterVerticleTest {
 
         String uncorrectedMessage = "uncorrected json";
 
-        vertx.eventBus().send(ROUTER_CHAT.getPath(), uncorrectedMessage, answer -> {
+        vertx.eventBus().request(ROUTER_CHAT.getPath(), uncorrectedMessage, answer -> {
             context.assertTrue(answer.failed());
             context.assertEquals("Wrong data for router: " + uncorrectedMessage, answer.cause().getMessage());
             async.complete();
@@ -92,7 +92,7 @@ public class RouterVerticleTest {
     public void sendCorrectDataShouldSuccess(TestContext context) {
         final Async async = context.async();
 
-        vertx.eventBus().send(ROUTER_CHAT.getPath(), correctGenericMessage, answer -> {
+        vertx.eventBus().request(ROUTER_CHAT.getPath(), correctGenericMessage, answer -> {
             context.assertTrue(answer.succeeded());
             async.complete();
         });

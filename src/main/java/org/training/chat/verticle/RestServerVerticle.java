@@ -35,17 +35,12 @@ public class RestServerVerticle extends AbstractVerticle {
 
         Router httpRouter = Router.router(vertx);
 
-        httpRouter.route("/*")
-                .handler(StaticHandler.create()
-                        .setCachingEnabled(false)
-                        .setWebRoot("static")
-                );
-        httpRouter.route().failureHandler(ErrorHandler.create(true));
+        httpRouter.route("/*").handler(StaticHandler.create());
+        httpRouter.route().failureHandler(ErrorHandler.create(vertx));
 
         httpRouter.route().handler(BodyHandler.create());
         httpRouter.post("/sign-up").handler(this::signUp);
-
-        httpServer.requestHandler(httpRouter::accept);
+        httpServer.requestHandler(httpRouter);
 
         httpServer.listen(ServerOption.getHttpPort());
         logger.debug("Deploy " + RestServerVerticle.class);
@@ -58,7 +53,7 @@ public class RestServerVerticle extends AbstractVerticle {
             RequestAuthorization requestAuthorization =
                     Json.decodeValue(signUpData, RequestAuthorization.class);
 
-            vertx.eventBus().send(DB_REGISTER_USER.getPath(), requestAuthorization,
+            vertx.eventBus().request(DB_REGISTER_USER.getPath(), requestAuthorization,
                     (AsyncResult<Message<User>> result) ->
                             answerRegistration(result, serverResponse));
         } catch (DecodeException e) {

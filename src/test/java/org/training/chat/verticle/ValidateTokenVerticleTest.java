@@ -52,7 +52,7 @@ public class ValidateTokenVerticleTest {
         });
 
         String correctUrl = "/token/" + expectedToken;
-        vertx.eventBus().send(VALIDATE_TOKEN.getPath(), correctUrl);
+        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl);
     }
 
     @Test(timeout = 10_000)
@@ -62,7 +62,7 @@ public class ValidateTokenVerticleTest {
         String badData = "ABCDEF";
         String errorMessage = "Wrong connect token, correct format: /token/ADDRESS" +
                 ", you write: " + badData;
-        vertx.eventBus().send(VALIDATE_TOKEN.getPath(), badData, answer -> {
+        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), badData, answer -> {
             context.assertTrue(answer.failed());
             context.assertEquals(errorMessage, answer.cause().getMessage());
             async.complete();
@@ -80,7 +80,7 @@ public class ValidateTokenVerticleTest {
         );
 
         String correctUrl = "/token/12345";
-        vertx.eventBus().send(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<UserDto>> resultUser) -> {
+        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<UserDto>> resultUser) -> {
             context.assertTrue(resultUser.succeeded());
 
             UserDto actualUser = resultUser.result().body();
@@ -100,7 +100,7 @@ public class ValidateTokenVerticleTest {
         );
 
         String correctUrl = "/token/12345";
-        vertx.eventBus().send(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<UserDto>> resultUser) -> {
+        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<UserDto>> resultUser) -> {
             context.assertTrue(resultUser.failed());
 
             context.assertEquals(errorMessage, resultUser.cause().getMessage());

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
     <head>
         <title>Chat</title>
         <script src="js/storage.js"></script>
@@ -12,9 +12,17 @@
         <div id="registrationPanel">
             <h1>Registration</h1>
 
-            <input id="inputLogin" type="text" placeholder="my login...">
-            <input id="inputFirstName" type="text" placeholder="firstName...">
-            <input id="inputLastName" type="text" placeholder="lastName...">
+            <label>Login:
+                <input id="inputLogin" type="text" placeholder="my login...">
+            </label>
+            <br/>
+            <label>First name:
+                <input id="inputFirstName" type="text" placeholder="firstName...">
+            </label>
+            <br/>
+            <label>Last name:
+                <input id="inputLastName" type="text" placeholder="lastName...">
+            </label>
             <br/><br/>
             <button id="buttonSignUp">Sign up</button>
         </div>
@@ -23,8 +31,12 @@
             <h1>Open chat</h1>
             <button id="buttonLogout">Logout</button>
             <br/><br/>
+            <label>Receiver's login:
+                <br/>
+                <input id="inputLoginReceiver" type="text" placeholder="receiver's login...">
+            </label>
+            <br/>
             <button id="buttonOpenChat">Open chat</button>
-            <input id="inputLoginReceiver" type="text" placeholder="receiver's login...">
         </div>
 
         <div id="chatPanel">
@@ -32,11 +44,14 @@
             <button id="buttonCloseChat">Close chat</button>
             <br/>
 
-            <input id="inputMessage" type="text" placeholder="text message...">
+            <label>Text message:
+                <br/>
+                <input id="inputMessage" type="text" placeholder="text message...">
+            </label>
             <button id="buttonSend">Send</button>
             <br/>
 
-            <h2>Messages:</h2>
+            <h2><label for="outputMessage">Messages:</label></h2>
             <textarea id="outputMessage" placeholder="Conversation" disabled cols="40" rows="8"></textarea>
         </div>
     </body>

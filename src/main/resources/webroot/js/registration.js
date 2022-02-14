@@ -16,7 +16,7 @@ function Registration(callbackResponse) {
     }
 
     function onResponse() {
-        if(httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+        if(httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
             var token = httpRequest.responseText
             console.log("Server's token: " + token);
 

@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function onEnterInputTextMessage(event) {
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             sendMessage();
         }
     }
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function onEnterInputLoginReceiver(event) {
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             openChat();
         }
     }

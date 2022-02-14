@@ -82,10 +82,10 @@ public class MethodRouterVerticleTest {
         String badData = "12345";
         TempMessage tempMessage = new TempMessage(USER, badData);
         String errorMessage = String.format("Cannot deserialize data: " +
-                "{\"user\":%s,\"message\":\"%s\"}",
-                USER.toString(), badData);
+                        "{\"user\":%s,\"message\":\"%s\"}",
+                USER, badData);
 
-        vertx.eventBus().send(ROUTER_METHOD.getPath(), tempMessage, answer -> {
+        vertx.eventBus().request(ROUTER_METHOD.getPath(), tempMessage, answer -> {
             context.assertTrue(answer.failed());
             context.assertEquals(errorMessage, answer.cause().getMessage());
             async.complete();

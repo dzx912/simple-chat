@@ -30,7 +30,7 @@ public class ChatVerticle extends AbstractVerticle {
     private void chatCreate(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> request = data.body();
         logger.info("Get message: {}", request);
-        vertx.eventBus().send(DB_CHAT_FIND_BY_LOGIN.getPath(), request, (AsyncResult<Message<Chat>> res) -> {
+        vertx.eventBus().request(DB_CHAT_FIND_BY_LOGIN.getPath(), request, (AsyncResult<Message<Chat>> res) -> {
             if (res.succeeded()) {
                 Chat chat = res.result().body();
                 ResponseCreateChat responseCreateChat = new ResponseCreateChat(request.getAuthor(), chat);
@@ -38,7 +38,7 @@ public class ChatVerticle extends AbstractVerticle {
                 vertx.eventBus().send(CHAT_ACKNOWLEDGE.getPath(), responseCreateChat);
             } else {
                 logger.info("Try create chat: {}", request);
-                vertx.eventBus().send(DB_CHAT_CREATE_BY_LOGIN.getPath(), request,
+                vertx.eventBus().request(DB_CHAT_CREATE_BY_LOGIN.getPath(), request,
                         (AsyncResult<Message<Chat>> resCreating) -> acknowledge(resCreating, request.getAuthor()));
             }
         });
@@ -59,7 +59,7 @@ public class ChatVerticle extends AbstractVerticle {
     private void chatAcknowledge(Message<ResponseCreateChat> data) {
         ResponseCreateChat responseCreateChat = data.body();
         UserDto user = responseCreateChat.getAuthor();
-        vertx.eventBus().send(DB_FIND_TOKEN_BY_USER.getPath(), user, (AsyncResult<Message<String>> res) -> {
+        vertx.eventBus().request(DB_FIND_TOKEN_BY_USER.getPath(), user, (AsyncResult<Message<String>> res) -> {
             if (res.succeeded()) {
                 String token = res.result().body();
                 String pathDevice = String.format(TOKEN.getPath(), token);
@@ -76,7 +76,7 @@ public class ChatVerticle extends AbstractVerticle {
                         vertx.eventBus().send(pathDevice, messageToDevice.body())
                 );
 
-                vertx.eventBus().send(CHAT_GET_HISTORY.getPath(), responseCreateChat.getChat(),
+                vertx.eventBus().request(CHAT_GET_HISTORY.getPath(), responseCreateChat.getChat(),
                         (AsyncResult<Message<String>> result) -> answerSendHistory(pathDevice, result)
                 );
             }
@@ -98,7 +98,7 @@ public class ChatVerticle extends AbstractVerticle {
 
     private void chatGetHistory(Message<Chat> data) {
         Chat chat = data.body();
-        vertx.eventBus().send(
+        vertx.eventBus().request(
                 DB_LOAD_MESSAGES_BY_CHAT.getPath(),
                 chat,
                 answer -> data.reply(answer.result().body())

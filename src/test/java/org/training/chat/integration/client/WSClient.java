@@ -3,8 +3,8 @@ package org.training.chat.integration.client;
 import com.google.common.base.Strings;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
+import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.http.WebSocketFrame;
 import org.training.chat.constants.ServerOption;
 
@@ -47,8 +47,8 @@ public class WSClient {
 
     public void run() {
         HttpClient httpClient = vertx.createHttpClient();
-        httpClient.websocketStream(getWSRequestOptions())
-                .handler(this::wsConnect);
+        httpClient.webSocket(getWSRequestOptions())
+                .onSuccess(this::wsConnect);
     }
 
     public void close() {
@@ -69,8 +69,8 @@ public class WSClient {
                 ));
     }
 
-    private RequestOptions getWSRequestOptions() {
-        RequestOptions options = new RequestOptions();
+    private WebSocketConnectOptions getWSRequestOptions() {
+        WebSocketConnectOptions options = new WebSocketConnectOptions();
         options.setHost(ServerOption.getHost());
         options.setPort(ServerOption.getWsPort());
         options.setURI("/token/" + token);

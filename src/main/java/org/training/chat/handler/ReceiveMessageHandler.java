@@ -29,6 +29,6 @@ public class ReceiveMessageHandler implements Handler<WebSocketFrame> {
         logger.info("Message from user: " + message);
         TempMessage tempMessage = new TempMessage(user, message);
 
-        vertx.eventBus().send(ROUTER_METHOD.getPath(), tempMessage);
+        vertx.eventBus().request(ROUTER_METHOD.getPath(), tempMessage);
     }
 }

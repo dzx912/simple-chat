@@ -34,7 +34,7 @@ public class ValidateTokenVerticle extends AbstractVerticle {
         Matcher m = PATTERN_TOKEN.matcher(url);
         if (m.matches()) {
             String token = m.group(1);
-            vertx.eventBus().send(DB_FIND_USER.getPath(), token, (AsyncResult<Message<UserDto>> resultUser) -> {
+            vertx.eventBus().request(DB_FIND_USER.getPath(), token, (AsyncResult<Message<UserDto>> resultUser) -> {
                 if (resultUser.succeeded()) {
                     UserDto user = resultUser.result().body();
                     logger.info("User: " + user);

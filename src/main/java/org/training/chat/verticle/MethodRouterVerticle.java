@@ -27,7 +27,7 @@ import static org.training.chat.constants.BusEndpoints.*;
 public class MethodRouterVerticle extends AbstractVerticle {
     private static final String WEB_SOCKET_CLOSE = "\u0003�";
     private static final EnumMap<WsMethod, BusEndpoints> WS_METHODS = new EnumMap<>(WsMethod.class);
-    private static final EnumMap<WsMethod, Class> WS_METHODS_TO_CLASS = new EnumMap<>(WsMethod.class);
+    private static final EnumMap<WsMethod, Class<?>> WS_METHODS_TO_CLASS = new EnumMap<>(WsMethod.class);
 
     static {
         WS_METHODS.put(WsMethod.sendTextMessage, ROUTER_CHAT);
@@ -75,7 +75,7 @@ public class MethodRouterVerticle extends AbstractVerticle {
         return busEndpoints.getPath();
     }
 
-    private Class getRequestClass(String method) {
+    private Class<?> getRequestClass(String method) {
         WsMethod wsMethod = WsMethod.valueOf(method);
         return WS_METHODS_TO_CLASS.get(wsMethod);
     }
@@ -83,7 +83,7 @@ public class MethodRouterVerticle extends AbstractVerticle {
     private GenericMessage<?> createGenericMessage(TempMessage tempMessage, JsonObject json, String method) {
         JsonObject content = json.getJsonObject("content");
         String message = content.encode();
-        Class requestClass = getRequestClass(method);
+        Class<?> requestClass = getRequestClass(method);
         Long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         return new GenericMessage<>(tempMessage.getUser(), Json.decodeValue(message, requestClass), timestamp);
     }

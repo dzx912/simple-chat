@@ -4,9 +4,9 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
-targetCompatibility = 15
-def versionVertx = '3.5.3'
+def versionVertx = '4.2.4'
 def versionLog4j = '2.17.1'
+def versionJackson = '2.13.1'
 def mainClass = 'org.training.chat.MainApp'
 
 repositories {
@@ -19,6 +19,8 @@ dependencies {
     implementation group: 'io.vertx', name: 'vertx-web', version: versionVertx
     implementation group: 'io.vertx', name: 'vertx-web-client', version: versionVertx
     implementation group: 'io.vertx', name: 'vertx-mongo-client', version: versionVertx
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versionJackson
 
     implementation group: 'com.lmax', name: 'disruptor', version: '3.4.2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versionLog4j

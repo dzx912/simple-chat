@@ -1,7 +1,7 @@
 package org.training.chat.verticle;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.http.RequestOptions;
+import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.http.WebSocketFrame;
 import io.vertx.core.json.DecodeException;
 import io.vertx.ext.unit.Async;
@@ -20,6 +20,8 @@ import org.training.chat.data.TempMessage;
 import org.training.chat.data.TextMessage;
 import org.training.chat.data.UserDto;
 import org.training.chat.util.Answerer;
+
+import java.util.Objects;
 
 import static org.training.chat.constants.BusEndpoints.*;
 
@@ -75,14 +77,15 @@ public class WsServerVerticleTest {
         TempMessage tempMessage = new TempMessage(USER, CHECK_TEXT);
 
         vertx.eventBus().localConsumer(ROUTER_METHOD.getPath(), receiveResult -> {
-            context.assertEquals(tempMessage, receiveResult.body());
-            async.complete();
+            if (Objects.equals(tempMessage, receiveResult.body())) {
+                async.complete();
+            }
         });
 
-        RequestOptions options = getWSRequestOptions(token);
+        WebSocketConnectOptions options = getWSRequestOptions(token);
         vertx.createHttpClient()
-                .websocketStream(options)
-                .handler(ws -> ws.writeFinalTextFrame(CHECK_TEXT));
+                .webSocket(options)
+                .onSuccess(ws -> ws.writeFinalTextFrame(CHECK_TEXT));
     }
 
     @Test(timeout = 10_000)
@@ -100,9 +103,9 @@ public class WsServerVerticleTest {
         );
         String correctMessage = Answerer.createResponseMessage("text", textMessage);
 
-        RequestOptions options = getWSRequestOptions(idChat);
+        WebSocketConnectOptions options = getWSRequestOptions(idChat);
 
-        vertx.createHttpClient().websocketStream(options).handler(
+        vertx.createHttpClient().webSocket(options).onSuccess(
                 ws -> ws.frameHandler(wsf -> receiveText(context, async, wsf, correctMessage)
                 ));
 
@@ -136,8 +139,8 @@ public class WsServerVerticleTest {
         }
     }
 
-    private RequestOptions getWSRequestOptions(String token) {
-        RequestOptions options = new RequestOptions();
+    private WebSocketConnectOptions getWSRequestOptions(String token) {
+        WebSocketConnectOptions options = new WebSocketConnectOptions();
         options.setHost(ServerOption.getHost());
         options.setPort(ServerOption.getWsPort());
         options.setURI("/token/" + token);
