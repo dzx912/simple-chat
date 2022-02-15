@@ -126,8 +126,6 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
 
         socket.send(json);
 
-        addTextMessage("Me: ", textMessage);
-
         clearInput();
     }
 

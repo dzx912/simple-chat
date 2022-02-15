@@ -36,8 +36,8 @@ public class RouterVerticle extends AbstractVerticle {
 
             String messageToClient = Answerer.createResponseMessage("text", textMessage);
 
-            vertx.eventBus().send(chatPath, messageToClient);
-            vertx.eventBus().send(DB_SAVE_MESSAGE.getPath(), textMessage);
+            vertx.eventBus().publish(chatPath, messageToClient);
+            vertx.eventBus().request(DB_SAVE_MESSAGE.getPath(), textMessage);
 
             data.reply("ok");
         } catch (ClassCastException exception) {
