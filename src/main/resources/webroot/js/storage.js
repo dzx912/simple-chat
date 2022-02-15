@@ -6,9 +6,9 @@ function ChatStorage() {
     }
 
     this.getChatToken = function() {
-        var isAuthorization = localStorage.getItem("isAuthorization") === 'true';
+        const isAuthorization = localStorage.getItem("isAuthorization") === 'true';
         if(isAuthorization) {
-            var localToken = localStorage.getItem("token")
+            const localToken = localStorage.getItem("token")
             if(localToken) {
                 return localToken
             }

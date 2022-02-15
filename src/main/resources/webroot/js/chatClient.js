@@ -1,7 +1,7 @@
 function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPanel, callbackClearToken) {
-    var socket;
-    var outputTextMessage = output;
-    var chatId;
+    let socket;
+    let outputTextMessage = output;
+    let chatId;
     this.callbackInit = callbackInit;
 
     function init() {
@@ -44,7 +44,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
         console.log("message: " + event.data);
 
         if(event.data) {
-            var json = JSON.parse(event.data);
+            const json = JSON.parse(event.data);
             routerWsMessage(json);
         }
     }
@@ -84,7 +84,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     }
 
     function showMessage(message) {
-        var author = message.author.login + ": ";
+        const author = message.author.login + ": ";
         addTextMessage(author, message.text);
     }
 
@@ -115,7 +115,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     }
 
     this.send = function(textMessage) {
-        var json = JSON.stringify({
+        const json = JSON.stringify({
             method: "sendTextMessage",
             content: {
                 clientId: 1,
@@ -132,13 +132,13 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     }
 
     function addTextMessage(author, message) {
-        var oldText = outputTextMessage.value;
+        const oldText = outputTextMessage.value;
 
         outputTextMessage.value = author + message + "\n" + oldText;
     }
 
     this.createChat = function(loginReceiver) {
-        var json = JSON.stringify({
+        const json = JSON.stringify({
             method: "createChat",
             content: {
                 loginReceiver: loginReceiver

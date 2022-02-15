@@ -1,20 +1,20 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var buttonSend = document.getElementById("buttonSend");
-    var inputTextMessage = document.getElementById("inputMessage");
-    var outputTextMessage = document.getElementById("outputMessage");
+    const buttonSend = document.getElementById("buttonSend");
+    const inputTextMessage = document.getElementById("inputMessage");
+    const outputTextMessage = document.getElementById("outputMessage");
 
-    var buttonLogout = document.getElementById("buttonLogout");
+    const buttonLogout = document.getElementById("buttonLogout");
 
-    var registrationPanel = document.getElementById("registrationPanel");
-    var openChatPanel = document.getElementById("openChatPanel");
-    var chatPanel = document.getElementById("chatPanel");
+    const registrationPanel = document.getElementById("registrationPanel");
+    const openChatPanel = document.getElementById("openChatPanel");
+    const chatPanel = document.getElementById("chatPanel");
 
-    var buttonSignUp = document.getElementById("buttonSignUp");
-    var inputLogin = document.getElementById("inputLogin");
-    var inputFirstName = document.getElementById("inputFirstName");
-    var inputLastName = document.getElementById("inputLastName");
+    const buttonSignUp = document.getElementById("buttonSignUp");
+    const inputLogin = document.getElementById("inputLogin");
+    const inputFirstName = document.getElementById("inputFirstName");
+    const inputLastName = document.getElementById("inputLastName");
 
-    var inputLoginReceiver = document.getElementById("inputLoginReceiver");
+    const inputLoginReceiver = document.getElementById("inputLoginReceiver");
 
     buttonSignUp.addEventListener("click", onSignUp);
 
@@ -27,14 +27,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     buttonCloseChat.addEventListener("click", closeChat);
 
-    var chatStorage = new ChatStorage();
-    var chatClient = new ChatClient(outputTextMessage, init, clearInput, showChatPanel, chatStorage.clearToken);
-    var registration = new Registration(responseRegistration);
+    const chatStorage = new ChatStorage();
+    const chatClient = new ChatClient(outputTextMessage, init, clearInput, showChatPanel, chatStorage.clearToken);
+    const registration = new Registration(responseRegistration);
 
     init();
 
     function init() {
-        var token = chatStorage.getChatToken()
+        const token = chatStorage.getChatToken()
         if(token) {
             chatClient.connect(token);
             showPanels('openChat');
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function sendMessage() {
-        var text = inputTextMessage.value;
+        const text = inputTextMessage.value;
         if(text) {
             chatClient.send(text)
         }
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function openChat() {
-        var loginReceiver = inputLoginReceiver.value;
+        const loginReceiver = inputLoginReceiver.value;
         if(loginReceiver) {
             chatClient.createChat(loginReceiver);
         }

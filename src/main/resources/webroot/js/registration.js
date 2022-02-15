@@ -1,9 +1,9 @@
 function Registration(callbackResponse) {
-    var httpRequest = new XMLHttpRequest();
+    const httpRequest = new XMLHttpRequest();
     httpRequest.addEventListener("readystatechange", onResponse);
 
     this.signUp = function (loginValue, firstNameValue, lastNameValue) {
-        var json = JSON.stringify({
+        const json = JSON.stringify({
           login: loginValue,
           firstName: firstNameValue,
           lastName: lastNameValue
@@ -17,7 +17,7 @@ function Registration(callbackResponse) {
 
     function onResponse() {
         if(httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
-            var token = httpRequest.responseText
+            const token = httpRequest.responseText
             console.log("Server's token: " + token);
 
             responseRegistration(token);
