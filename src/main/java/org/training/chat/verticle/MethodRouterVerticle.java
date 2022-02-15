@@ -59,7 +59,7 @@ public class MethodRouterVerticle extends AbstractVerticle {
                 GenericMessage<?> genericMessage = createGenericMessage(tempMessage, json, method);
 
                 logger.info("Path: {}, message: {}", path, genericMessage);
-                vertx.eventBus().send(path, genericMessage);
+                vertx.eventBus().request(path, genericMessage);
                 data.reply("ok");
             } else {
                 data.fail(-1, "Empty client message");
