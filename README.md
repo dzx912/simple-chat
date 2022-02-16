@@ -1,5 +1,7 @@
 # Simple Chat
 
+[![Build status](https://github.com/dzx912/simple-chat/actions/workflows/gradle.yml/badge.svg?branch=master)](https://github.com/dzx912/simple-chat/actions/workflows/gradle.yml)
+
 Lightweight chat by Java Vert.x
 
 ## Compile
