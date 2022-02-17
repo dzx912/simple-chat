@@ -5,7 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.codec.Codec;
 import org.training.chat.data.*;
-import org.training.chat.data.db.User;
+import org.training.chat.data.db.UserDb;
 import org.training.chat.verticle.*;
 
 public class MainApp {
@@ -26,7 +26,7 @@ public class MainApp {
         vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
         vertx.eventBus().registerDefaultCodec(RequestAuthorization.class, new Codec<>(RequestAuthorization.class));
-        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
+        vertx.eventBus().registerDefaultCodec(UserDb.class, new Codec<>(UserDb.class));
         vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
         vertx.eventBus().registerDefaultCodec(RequestTextMessage.class, new Codec<>(RequestTextMessage.class));
         vertx.eventBus().registerDefaultCodec(GenericMessage.class, new Codec<>(GenericMessage.class));

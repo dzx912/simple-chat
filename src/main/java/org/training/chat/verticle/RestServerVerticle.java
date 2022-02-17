@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
 import org.training.chat.data.RequestAuthorization;
-import org.training.chat.data.db.User;
+import org.training.chat.data.db.UserDb;
 
 import static org.training.chat.constants.BusEndpoints.DB_REGISTER_USER;
 
@@ -54,7 +54,7 @@ public class RestServerVerticle extends AbstractVerticle {
                     Json.decodeValue(signUpData, RequestAuthorization.class);
 
             vertx.eventBus().request(DB_REGISTER_USER.getPath(), requestAuthorization,
-                    (AsyncResult<Message<User>> result) ->
+                    (AsyncResult<Message<UserDb>> result) ->
                             answerRegistration(result, serverResponse));
         } catch (DecodeException e) {
             logger.error(e);
@@ -70,7 +70,7 @@ public class RestServerVerticle extends AbstractVerticle {
         serverResponse.end(message);
     }
 
-    private void answerRegistration(AsyncResult<Message<User>> messageAsyncResult, HttpServerResponse serverResponse) {
+    private void answerRegistration(AsyncResult<Message<UserDb>> messageAsyncResult, HttpServerResponse serverResponse) {
         if (messageAsyncResult.succeeded()) {
             String token = messageAsyncResult.result().body().token();
             logger.info("Register user by token: " + token);

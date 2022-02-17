@@ -7,11 +7,11 @@ import java.util.Random;
 /**
  * POJO объект, который хранит данные о пользователе в БД
  */
-public record User(String login, String firstName, String lastName, String token) {
+public record UserDb(String login, String firstName, String lastName, String token) {
 
-    public static User of(RequestAuthorization user) {
+    public static UserDb of(RequestAuthorization user) {
         long randomToken = new Random().nextLong();
-        return new User(
+        return new UserDb(
                 user.login(),
                 user.firstName(),
                 user.lastName(),

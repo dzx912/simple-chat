@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.training.chat.codec.Codec;
 import org.training.chat.constants.ServerOption;
 import org.training.chat.data.RequestAuthorization;
-import org.training.chat.data.db.User;
+import org.training.chat.data.db.UserDb;
 
 import static org.training.chat.constants.BusEndpoints.DB_REGISTER_USER;
 
@@ -33,7 +33,7 @@ public class RestServerVerticleTest {
         client = WebClient.create(vertx);
 
         vertx.eventBus().registerDefaultCodec(RequestAuthorization.class, new Codec<>(RequestAuthorization.class));
-        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
+        vertx.eventBus().registerDefaultCodec(UserDb.class, new Codec<>(UserDb.class));
 
         vertx.deployVerticle(RestServerVerticle.class.getName(), context.asyncAssertSuccess());
     }
@@ -75,7 +75,7 @@ public class RestServerVerticleTest {
         String lastName = "Lenok";
         String jsonRequestExpected = String.format("{\"login\":\"%s\",\"firstName\":\"%s\",\"lastName\":\"%s\"}",
                 login, firstName, lastName);
-        User user = User.of(new RequestAuthorization(login, firstName, lastName));
+        UserDb user = UserDb.of(new RequestAuthorization(login, firstName, lastName));
 
         vertx.eventBus().localConsumer(DB_REGISTER_USER.getPath(),
                 data -> data.reply(user)

@@ -11,7 +11,7 @@ import io.vertx.ext.mongo.MongoClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.data.*;
-import org.training.chat.data.db.User;
+import org.training.chat.data.db.UserDb;
 
 import java.util.Arrays;
 import java.util.List;
@@ -212,7 +212,7 @@ public class MongoDbVerticle extends AbstractVerticle {
     }
 
     private void registerUser(Message<RequestAuthorization> data) {
-        User user = User.of(data.body());
+        UserDb user = UserDb.of(data.body());
 
         JsonObject jsonUser = new JsonObject(Json.encode(user));
         JsonObject query = new JsonObject().put("login", user.login());
@@ -228,7 +228,7 @@ public class MongoDbVerticle extends AbstractVerticle {
         });
     }
 
-    private void createNewUser(Message<RequestAuthorization> data, User user, JsonObject jsonUser) {
+    private void createNewUser(Message<RequestAuthorization> data, UserDb user, JsonObject jsonUser) {
         client.insert(TAG_USER, jsonUser, savedResult -> {
             if (savedResult.succeeded()) {
                 logger.debug("Save: " + savedResult.result());

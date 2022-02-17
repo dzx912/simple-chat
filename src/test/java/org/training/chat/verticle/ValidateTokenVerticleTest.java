@@ -94,7 +94,7 @@ public class ValidateTokenVerticleTest {
     public void tokenWithoutUserInDatabaseShouldReturnFail(TestContext context) {
         final Async async = context.async();
 
-        String errorMessage = "User not found";
+        String errorMessage = "UserDb not found";
         vertx.eventBus().localConsumer(DB_FIND_USER.getPath(),
                 data -> data.fail(-2, errorMessage)
         );
