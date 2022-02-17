@@ -58,12 +58,12 @@ public class ChatVerticle extends AbstractVerticle {
 
     private void chatAcknowledge(Message<ResponseCreateChat> data) {
         ResponseCreateChat responseCreateChat = data.body();
-        UserDto user = responseCreateChat.getAuthor();
+        UserDto user = responseCreateChat.author();
         vertx.eventBus().request(DB_FIND_TOKEN_BY_USER.getPath(), user, (AsyncResult<Message<String>> res) -> {
             if (res.succeeded()) {
                 String token = res.result().body();
                 String pathDevice = String.format(TOKEN.getPath(), token);
-                String pathChat = String.format(CHAT.getPath(), responseCreateChat.getChat().getId());
+                String pathChat = String.format(CHAT.getPath(), responseCreateChat.chat().getId());
 
                 logger.info("Receiver pathDevice: " + pathDevice);
 
@@ -76,7 +76,7 @@ public class ChatVerticle extends AbstractVerticle {
                         vertx.eventBus().request(pathDevice, messageToDevice.body())
                 );
 
-                vertx.eventBus().request(CHAT_GET_HISTORY.getPath(), responseCreateChat.getChat(),
+                vertx.eventBus().request(CHAT_GET_HISTORY.getPath(), responseCreateChat.chat(),
                         (AsyncResult<Message<String>> result) -> answerSendHistory(pathDevice, result)
                 );
             }
