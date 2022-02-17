@@ -5,7 +5,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.eventbus.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,9 +34,9 @@ public class ValidateTokenVerticle extends AbstractVerticle {
         Matcher m = PATTERN_TOKEN.matcher(url);
         if (m.matches()) {
             String token = m.group(1);
-            vertx.eventBus().request(DB_FIND_USER.getPath(), token, (AsyncResult<Message<UserDto>> resultUser) -> {
+            vertx.eventBus().request(DB_FIND_USER.getPath(), token, (AsyncResult<Message<User>> resultUser) -> {
                 if (resultUser.succeeded()) {
-                    UserDto user = resultUser.result().body();
+                    User user = resultUser.result().body();
                     logger.info("User: " + user);
                     data.reply(user);
                 } else {

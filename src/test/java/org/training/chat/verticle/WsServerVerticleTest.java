@@ -18,7 +18,7 @@ import org.training.chat.constants.ServerOption;
 import org.training.chat.data.Chat;
 import org.training.chat.data.TempMessage;
 import org.training.chat.data.TextMessage;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 import org.training.chat.util.Answerer;
 
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class WsServerVerticleTest {
     private final static String WEB_SOCKET_CLOSE = "\u0003�";
     private final static String TEXT_HISTORY = "{\"type\":\"history\",\"content\":{\"history\":[]}}";
     private final static String CHECK_TEXT = "checkText";
-    private final static UserDto USER = new UserDto("1", "dzx912", "Anton", "Lenok");
+    private final static User USER = new User("1", "dzx912", "Anton", "Lenok");
     private final Logger logger = LogManager.getLogger(WsServerVerticleTest.class);
     private Vertx vertx;
 
@@ -45,7 +45,7 @@ public class WsServerVerticleTest {
         vertx.eventBus().registerDefaultCodec(TempMessage.class, new Codec<>(TempMessage.class));
         vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
-        vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
+        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
 
         vertx.deployVerticle(WsServerVerticle.class.getName(), context.asyncAssertSuccess());
 
@@ -95,7 +95,7 @@ public class WsServerVerticleTest {
         String idChat = "2";
 
         TextMessage textMessage = new TextMessage(
-                new UserDto("id", "login", "firstName", "lastName"),
+                new User("id", "login", "firstName", "lastName"),
                 "2",
                 "text message",
                 3L,

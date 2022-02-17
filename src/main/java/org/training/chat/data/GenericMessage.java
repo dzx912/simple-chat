@@ -8,7 +8,7 @@ import io.vertx.core.json.Json;
  *
  * @param <T> JSON полученный от пользователя
  */
-public record GenericMessage<T>(UserDto author, T message, Long timestamp) {
+public record GenericMessage<T>(User author, T message, Long timestamp) {
     @Override
     public String toString() {
         return Json.encode(this);

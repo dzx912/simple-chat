@@ -10,7 +10,7 @@ import io.vertx.core.http.ServerWebSocket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.constants.ServerOption;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 import org.training.chat.handler.ReceiveMessageHandler;
 import org.training.chat.handler.SendMessageHandler;
 
@@ -60,14 +60,14 @@ public class WsServerVerticle extends AbstractVerticle {
         vertx.eventBus().request(
                 VALIDATE_TOKEN.getPath(),
                 path,
-                (AsyncResult<Message<UserDto>> answer) -> validateToken(wsServer, answer)
+                (AsyncResult<Message<User>> answer) -> validateToken(wsServer, answer)
         );
     }
 
-    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<UserDto>> answer) {
+    private void validateToken(ServerWebSocket wsServer, AsyncResult<Message<User>> answer) {
         if (answer.succeeded()) {
             wsServer.resume();
-            UserDto user = answer.result().body();
+            User user = answer.result().body();
             logger.debug("Token correct: " + user);
 
             // Подключаем обработчик WebSocket сообщений

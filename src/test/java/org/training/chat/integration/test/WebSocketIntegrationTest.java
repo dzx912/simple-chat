@@ -41,7 +41,7 @@ public class WebSocketIntegrationTest {
         vertx.eventBus().registerDefaultCodec(TempMessage.class, new Codec<>(TempMessage.class));
         vertx.eventBus().registerDefaultCodec(TextMessage.class, new Codec<>(TextMessage.class));
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
-        vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
+        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
         vertx.eventBus().registerDefaultCodec(GenericMessage.class, new Codec<>(GenericMessage.class));
         vertx.eventBus().registerDefaultCodec(ResponseCreateChat.class, new Codec<>(ResponseCreateChat.class));
 
@@ -66,7 +66,7 @@ public class WebSocketIntegrationTest {
         vertx.eventBus().consumer(DB_SAVE_MESSAGE.getPath(), (empty) -> {
         });
         vertx.eventBus().consumer(DB_FIND_USER.getPath(), (data) ->
-                data.reply(new UserDto("1", "dzx912", "Anton", "Lenok"))
+                data.reply(new User("1", "dzx912", "Anton", "Lenok"))
         );
         vertx.eventBus().consumer(DB_CHAT_FIND_BY_LOGIN.getPath(), (data) ->
                 data.reply(new Chat(CHAT_ID, Collections.emptyList()))

@@ -45,7 +45,7 @@ public class ChatVerticle extends AbstractVerticle {
         data.reply("ok");
     }
 
-    private void acknowledge(AsyncResult<Message<Chat>> res, UserDto author) {
+    private void acknowledge(AsyncResult<Message<Chat>> res, User author) {
         if (res.succeeded()) {
             Chat chat = res.result().body();
             ResponseCreateChat responseCreateChat = new ResponseCreateChat(author, chat);
@@ -58,7 +58,7 @@ public class ChatVerticle extends AbstractVerticle {
 
     private void chatAcknowledge(Message<ResponseCreateChat> data) {
         ResponseCreateChat responseCreateChat = data.body();
-        UserDto user = responseCreateChat.author();
+        User user = responseCreateChat.author();
         vertx.eventBus().request(DB_FIND_TOKEN_BY_USER.getPath(), user, (AsyncResult<Message<String>> res) -> {
             if (res.succeeded()) {
                 String token = res.result().body();

@@ -13,7 +13,7 @@ import org.training.chat.codec.Codec;
 import org.training.chat.data.GenericMessage;
 import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TempMessage;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER_CHAT;
 import static org.training.chat.constants.BusEndpoints.ROUTER_METHOD;
@@ -25,7 +25,7 @@ import static org.training.chat.constants.BusEndpoints.ROUTER_METHOD;
 public class MethodRouterVerticleTest {
     private Vertx vertx;
 
-    private static final UserDto USER = new UserDto("id", "login", "firstName", "lastName");
+    private static final User USER = new User("id", "login", "firstName", "lastName");
 
     @Before
     public void setUp(TestContext context) {

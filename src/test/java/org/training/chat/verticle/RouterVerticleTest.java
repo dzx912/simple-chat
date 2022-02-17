@@ -12,7 +12,7 @@ import org.training.chat.codec.Codec;
 import org.training.chat.data.GenericMessage;
 import org.training.chat.data.RequestTextMessage;
 import org.training.chat.data.TextMessage;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 import org.training.chat.util.Answerer;
 
 import static org.training.chat.constants.BusEndpoints.CHAT;
@@ -39,7 +39,7 @@ public class RouterVerticleTest {
 
         vertx.deployVerticle(RouterVerticle.class.getName(), context.asyncAssertSuccess());
 
-        UserDto user = new UserDto("id", "login", "firstName", "lastName");
+        User user = new User("id", "login", "firstName", "lastName");
         String text = "text message";
         long clientId = 3L;
         long timestamp = 10L;

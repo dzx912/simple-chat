@@ -18,7 +18,7 @@ import static org.training.chat.constants.BusEndpoints.*;
 @RunWith(VertxUnitRunner.class)
 public class ChatVerticleTest {
     private final static String TEXT_HISTORY = "{\"type\":\"history\",\"content\":{\"history\":[]}}";
-    private final static UserDto USER = new UserDto("1", "dzx912", "Anton", "Lenok");
+    private final static User USER = new User("1", "dzx912", "Anton", "Lenok");
     private final static GenericMessage<RequestCreateChat> MESSAGE_CREATE_CHAT = new GenericMessage<>(USER, new RequestCreateChat("1"), 10L);
     private final static String CHAT_ID = "test_chat_id";
     private final static String PATH_DEVICE = String.format(TOKEN.getPath(), "test_token");
@@ -33,7 +33,7 @@ public class ChatVerticleTest {
         vertx.eventBus().registerDefaultCodec(RequestCreateChat.class, new Codec<>(RequestCreateChat.class));
         vertx.eventBus().registerDefaultCodec(ResponseCreateChat.class, new Codec<>(ResponseCreateChat.class));
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
-        vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
+        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
 
         vertx.deployVerticle(ChatVerticle.class.getName(), context.asyncAssertSuccess());
 

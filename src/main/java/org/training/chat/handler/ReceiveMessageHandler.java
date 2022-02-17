@@ -6,7 +6,7 @@ import io.vertx.core.http.WebSocketFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.training.chat.data.TempMessage;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 
 import static org.training.chat.constants.BusEndpoints.ROUTER_METHOD;
 
@@ -15,10 +15,10 @@ public class ReceiveMessageHandler implements Handler<WebSocketFrame> {
     private final Logger logger = LogManager.getLogger(ReceiveMessageHandler.class);
 
     private final Vertx vertx;
-    private final UserDto user;
+    private final User user;
 
 
-    public ReceiveMessageHandler(Vertx vertx, UserDto user) {
+    public ReceiveMessageHandler(Vertx vertx, User user) {
         this.user = user;
         this.vertx = vertx;
     }

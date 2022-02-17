@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.training.chat.codec.Codec;
-import org.training.chat.data.UserDto;
+import org.training.chat.data.User;
 
 import static org.training.chat.constants.BusEndpoints.DB_FIND_USER;
 import static org.training.chat.constants.BusEndpoints.VALIDATE_TOKEN;
@@ -28,7 +28,7 @@ public class ValidateTokenVerticleTest {
     public void setUp(TestContext context) {
         vertx = Vertx.vertx();
 
-        vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
+        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
 
         vertx.deployVerticle(ValidateTokenVerticle.class.getName(), context.asyncAssertSuccess());
     }
@@ -73,17 +73,17 @@ public class ValidateTokenVerticleTest {
     public void tokenWithUserInDatabaseShouldReturnUser(TestContext context) {
         final Async async = context.async();
 
-        UserDto expectedUser = new UserDto("id", "login", "firstName", "lastName");
+        User expectedUser = new User("id", "login", "firstName", "lastName");
 
         vertx.eventBus().localConsumer(DB_FIND_USER.getPath(),
                 data -> data.reply(expectedUser)
         );
 
         String correctUrl = "/token/12345";
-        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<UserDto>> resultUser) -> {
+        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<User>> resultUser) -> {
             context.assertTrue(resultUser.succeeded());
 
-            UserDto actualUser = resultUser.result().body();
+            User actualUser = resultUser.result().body();
             context.assertEquals(expectedUser, actualUser);
 
             async.complete();
@@ -100,7 +100,7 @@ public class ValidateTokenVerticleTest {
         );
 
         String correctUrl = "/token/12345";
-        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<UserDto>> resultUser) -> {
+        vertx.eventBus().request(VALIDATE_TOKEN.getPath(), correctUrl, (AsyncResult<Message<User>> resultUser) -> {
             context.assertTrue(resultUser.failed());
 
             context.assertEquals(errorMessage, resultUser.cause().getMessage());

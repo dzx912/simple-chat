@@ -47,8 +47,8 @@ public class MongoDbVerticle extends AbstractVerticle {
         logger.debug("Deploy " + MongoDbVerticle.class);
     }
 
-    private void findTokenByUser(Message<UserDto> data) {
-        UserDto sender = data.body();
+    private void findTokenByUser(Message<User> data) {
+        User sender = data.body();
 
         JsonObject jsonReceiverLogin = new JsonObject().put("login", sender.login());
         client.findOne(TAG_USER, jsonReceiverLogin, null, result -> {
@@ -95,15 +95,15 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     private void createChat(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> request = data.body();
-        UserDto sender = request.author();
+        User sender = request.author();
         String receiverLogin = request.message().loginReceiver();
 
         JsonObject jsonReceiverLogin = new JsonObject().put("login", receiverLogin);
         client.findOne(TAG_USER, jsonReceiverLogin, null, result -> {
             if (result.succeeded()) {
-                Optional<UserDto> userOpt = jsonToUserDto(result.result());
+                Optional<User> userOpt = jsonToUserDto(result.result());
                 if (userOpt.isPresent()) {
-                    UserDto receiver = userOpt.get();
+                    User receiver = userOpt.get();
                     createChatByIds(data, sender, receiver);
                 } else {
                     data.fail(-2, "User not found");
@@ -114,8 +114,8 @@ public class MongoDbVerticle extends AbstractVerticle {
         });
     }
 
-    private <T> void createChatByIds(Message<T> data, UserDto user1, UserDto user2) {
-        List<UserDto> users = Arrays.asList(user1, user2);
+    private <T> void createChatByIds(Message<T> data, User user1, User user2) {
+        List<User> users = Arrays.asList(user1, user2);
         String jsonUsers = Json.encode(users);
         JsonObject requestJsonUsers = new JsonObject()
                 .put("users", new JsonArray(jsonUsers));
@@ -142,7 +142,7 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     private void answerAboutFindUser(Message<String> data, AsyncResult<JsonObject> result) {
         if (result.succeeded()) {
-            Optional<UserDto> userOpt = jsonToUserDto(result.result());
+            Optional<User> userOpt = jsonToUserDto(result.result());
             if (userOpt.isPresent()) {
                 data.reply(userOpt.get());
             } else {
@@ -153,10 +153,10 @@ public class MongoDbVerticle extends AbstractVerticle {
         }
     }
 
-    private Optional<UserDto> jsonToUserDto(JsonObject result) {
+    private Optional<User> jsonToUserDto(JsonObject result) {
         logger.info(result);
         if (result != null) {
-            UserDto user = new UserDto(
+            User user = new User(
                     result.getString("_id"),
                     result.getString("login"),
                     result.getString("firstName"),
