@@ -12,7 +12,7 @@ public class MainApp {
 
     private final static Logger logger = LogManager.getLogger(MainApp.class);
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         logger.info("Start App");
         Vertx vertx = Vertx.vertx();
 
@@ -27,7 +27,7 @@ public class MainApp {
         vertx.eventBus().registerDefaultCodec(Chat.class, new Codec<>(Chat.class));
         vertx.eventBus().registerDefaultCodec(RequestAuthorization.class, new Codec<>(RequestAuthorization.class));
         vertx.eventBus().registerDefaultCodec(UserDb.class, new Codec<>(UserDb.class));
-        vertx.eventBus().registerDefaultCodec(UserDto.class, new Codec<>(UserDto.class));
+        vertx.eventBus().registerDefaultCodec(User.class, new Codec<>(User.class));
         vertx.eventBus().registerDefaultCodec(RequestTextMessage.class, new Codec<>(RequestTextMessage.class));
         vertx.eventBus().registerDefaultCodec(GenericMessage.class, new Codec<>(GenericMessage.class));
         vertx.eventBus().registerDefaultCodec(RequestCreateChat.class, new Codec<>(RequestCreateChat.class));
