@@ -59,9 +59,9 @@ public class MethodRouterVerticleTest {
                 GenericMessage<RequestTextMessage> genericMessage = tempMessageData.body();
 
                 RequestTextMessage requestTextMessage = genericMessage.getMessage();
-                context.assertEquals(text, requestTextMessage.getText());
-                context.assertEquals(chatId, requestTextMessage.getChatId());
-                context.assertEquals(clientId, requestTextMessage.getClientId());
+                context.assertEquals(text, requestTextMessage.text());
+                context.assertEquals(chatId, requestTextMessage.chatId());
+                context.assertEquals(clientId, requestTextMessage.clientId());
 
                 context.assertEquals(USER, genericMessage.getAuthor());
                 async.complete();
