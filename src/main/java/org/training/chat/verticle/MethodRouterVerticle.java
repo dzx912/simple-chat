@@ -49,7 +49,7 @@ public class MethodRouterVerticle extends AbstractVerticle {
         TempMessage tempMessage = data.body();
         logger.info("Get message: {}", tempMessage);
         try {
-            String clientMessage = tempMessage.getMessage();
+            String clientMessage = tempMessage.message();
             JsonObject json = new JsonObject(clientMessage);
 
             boolean webSocketIsClosed = clientMessage.isEmpty() || WEB_SOCKET_CLOSE.equals(clientMessage);
@@ -85,6 +85,6 @@ public class MethodRouterVerticle extends AbstractVerticle {
         String message = content.encode();
         Class<?> requestClass = getRequestClass(method);
         Long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        return new GenericMessage<>(tempMessage.getUser(), Json.decodeValue(message, requestClass), timestamp);
+        return new GenericMessage<>(tempMessage.user(), Json.decodeValue(message, requestClass), timestamp);
     }
 }
