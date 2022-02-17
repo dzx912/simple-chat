@@ -31,7 +31,7 @@ public class RouterVerticle extends AbstractVerticle {
 
             logger.info("WebSocket textMessage: " + textMessage);
 
-            String chatPath = String.format(CHAT.getPath(), textMessage.getChatId());
+            String chatPath = String.format(CHAT.getPath(), textMessage.chatId());
             logger.info("Send to chat: " + chatPath);
 
             String messageToClient = Answerer.createResponseMessage("text", textMessage);
