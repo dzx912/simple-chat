@@ -33,13 +33,13 @@ public class ChatVerticle extends AbstractVerticle {
         vertx.eventBus().request(DB_CHAT_FIND_BY_LOGIN.getPath(), request, (AsyncResult<Message<Chat>> res) -> {
             if (res.succeeded()) {
                 Chat chat = res.result().body();
-                ResponseCreateChat responseCreateChat = new ResponseCreateChat(request.getAuthor(), chat);
+                ResponseCreateChat responseCreateChat = new ResponseCreateChat(request.author(), chat);
                 logger.info("Find chat by login: {}", responseCreateChat);
                 vertx.eventBus().request(CHAT_ACKNOWLEDGE.getPath(), responseCreateChat);
             } else {
                 logger.info("Try create chat: {}", request);
                 vertx.eventBus().request(DB_CHAT_CREATE_BY_LOGIN.getPath(), request,
-                        (AsyncResult<Message<Chat>> resCreating) -> acknowledge(resCreating, request.getAuthor()));
+                        (AsyncResult<Message<Chat>> resCreating) -> acknowledge(resCreating, request.author()));
             }
         });
         data.reply("ok");

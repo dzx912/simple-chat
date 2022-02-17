@@ -48,11 +48,11 @@ public class RouterVerticle extends AbstractVerticle {
     }
 
     private TextMessage convertGenericMessageToTextMessage(GenericMessage<RequestTextMessage> tempMessage) {
-        RequestTextMessage requestTextMessage = tempMessage.getMessage();
-        return new TextMessage(tempMessage.getAuthor(),
+        RequestTextMessage requestTextMessage = tempMessage.message();
+        return new TextMessage(tempMessage.author(),
                 requestTextMessage.chatId(),
                 requestTextMessage.text(),
                 requestTextMessage.clientId(),
-                tempMessage.getTimestamp());
+                tempMessage.timestamp());
     }
 }

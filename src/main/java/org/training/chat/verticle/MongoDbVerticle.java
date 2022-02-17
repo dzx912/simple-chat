@@ -67,8 +67,8 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     private void findChatByLogin(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> requestCreateChat = data.body();
-        RequestCreateChat createChat = requestCreateChat.getMessage();
-        String senderLogin = requestCreateChat.getAuthor().login();
+        RequestCreateChat createChat = requestCreateChat.message();
+        String senderLogin = requestCreateChat.author().login();
         String receiverLogin = createChat.loginReceiver();
 
         // Ищим чат, в котом ровно 2 пользователя
@@ -95,8 +95,8 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     private void createChat(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> request = data.body();
-        UserDto sender = request.getAuthor();
-        String receiverLogin = request.getMessage().loginReceiver();
+        UserDto sender = request.author();
+        String receiverLogin = request.message().loginReceiver();
 
         JsonObject jsonReceiverLogin = new JsonObject().put("login", receiverLogin);
         client.findOne(TAG_USER, jsonReceiverLogin, null, result -> {

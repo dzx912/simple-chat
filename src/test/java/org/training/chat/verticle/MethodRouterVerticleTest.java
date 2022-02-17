@@ -58,12 +58,12 @@ public class MethodRouterVerticleTest {
             try {
                 GenericMessage<RequestTextMessage> genericMessage = tempMessageData.body();
 
-                RequestTextMessage requestTextMessage = genericMessage.getMessage();
+                RequestTextMessage requestTextMessage = genericMessage.message();
                 context.assertEquals(text, requestTextMessage.text());
                 context.assertEquals(chatId, requestTextMessage.chatId());
                 context.assertEquals(clientId, requestTextMessage.clientId());
 
-                context.assertEquals(USER, genericMessage.getAuthor());
+                context.assertEquals(USER, genericMessage.author());
                 async.complete();
             } catch (ClassCastException exception) {
                 context.fail("Wrong JSON TextMessage: " + tempMessageData.body());
