@@ -3,7 +3,7 @@ version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 17
 def versionVertx = '4.2.4'
 def versionLog4j = '2.17.1'
 def versionJackson = '2.13.1'
