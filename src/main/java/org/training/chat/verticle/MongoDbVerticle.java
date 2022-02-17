@@ -50,7 +50,7 @@ public class MongoDbVerticle extends AbstractVerticle {
     private void findTokenByUser(Message<UserDto> data) {
         UserDto sender = data.body();
 
-        JsonObject jsonReceiverLogin = new JsonObject().put("login", sender.getLogin());
+        JsonObject jsonReceiverLogin = new JsonObject().put("login", sender.login());
         client.findOne(TAG_USER, jsonReceiverLogin, null, result -> {
             if (result.succeeded()) {
                 String token = result.result().getString("token");
@@ -68,7 +68,7 @@ public class MongoDbVerticle extends AbstractVerticle {
     private void findChatByLogin(Message<GenericMessage<RequestCreateChat>> data) {
         GenericMessage<RequestCreateChat> requestCreateChat = data.body();
         RequestCreateChat createChat = requestCreateChat.getMessage();
-        String senderLogin = requestCreateChat.getAuthor().getLogin();
+        String senderLogin = requestCreateChat.getAuthor().login();
         String receiverLogin = createChat.getLoginReceiver();
 
         // Ищим чат, в котом ровно 2 пользователя
@@ -156,11 +156,11 @@ public class MongoDbVerticle extends AbstractVerticle {
     private Optional<UserDto> jsonToUserDto(JsonObject result) {
         logger.info(result);
         if (result != null) {
-            UserDto user = new UserDto();
-            user.setId(result.getString("_id"));
-            user.setLogin(result.getString("login"));
-            user.setFirstName(result.getString("firstName"));
-            user.setLastName(result.getString("lastName"));
+            UserDto user = new UserDto(
+                    result.getString("_id"),
+                    result.getString("login"),
+                    result.getString("firstName"),
+                    result.getString("lastName"));
             return Optional.of(user);
         } else {
             return Optional.empty();
