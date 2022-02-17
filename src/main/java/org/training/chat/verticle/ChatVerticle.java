@@ -63,7 +63,7 @@ public class ChatVerticle extends AbstractVerticle {
             if (res.succeeded()) {
                 String token = res.result().body();
                 String pathDevice = String.format(TOKEN.getPath(), token);
-                String pathChat = String.format(CHAT.getPath(), responseCreateChat.chat().getId());
+                String pathChat = String.format(CHAT.getPath(), responseCreateChat.chat().id());
 
                 logger.info("Receiver pathDevice: " + pathDevice);
 

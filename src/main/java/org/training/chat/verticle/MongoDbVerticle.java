@@ -170,8 +170,7 @@ public class MongoDbVerticle extends AbstractVerticle {
     private Optional<Chat> jsonToChat(JsonObject result) {
         logger.info(result);
         if (result != null) {
-            Chat chat = new Chat();
-            chat.setId(result.getString("_id"));
+            Chat chat = new Chat(result.getString("_id"), null);
             return Optional.of(chat);
         } else {
             return Optional.empty();
@@ -180,7 +179,7 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     private void loadMessageByChat(Message<Chat> data) {
         Chat chat = data.body();
-        JsonObject jsonChat = new JsonObject().put("chatId", chat.getId());
+        JsonObject jsonChat = new JsonObject().put("chatId", chat.id());
         client.find(TAG_MESSAGE, jsonChat,
                 result -> {
                     List<JsonObject> history = result.result();
