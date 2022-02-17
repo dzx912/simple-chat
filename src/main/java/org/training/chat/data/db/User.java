@@ -7,53 +7,14 @@ import java.util.Random;
 /**
  * POJO объект, который хранит данные о пользователе в БД
  */
-public class User {
-    private String login;
-    private String firstName;
-    private String lastName;
-    private String token;
+public record User(String login, String firstName, String lastName, String token) {
 
-    public User() {
-    }
-
-    public User(RequestAuthorization user) {
-        this.login = user.login();
-        this.firstName = user.firstName();
-        this.lastName = user.lastName();
-
+    public static User of(RequestAuthorization user) {
         long randomToken = new Random().nextLong();
-        this.token = String.valueOf(randomToken);
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
+        return new User(
+                user.login(),
+                user.firstName(),
+                user.lastName(),
+                String.valueOf(randomToken));
     }
 }

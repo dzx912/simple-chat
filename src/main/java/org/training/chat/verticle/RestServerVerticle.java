@@ -72,7 +72,7 @@ public class RestServerVerticle extends AbstractVerticle {
 
     private void answerRegistration(AsyncResult<Message<User>> messageAsyncResult, HttpServerResponse serverResponse) {
         if (messageAsyncResult.succeeded()) {
-            String token = messageAsyncResult.result().body().getToken();
+            String token = messageAsyncResult.result().body().token();
             logger.info("Register user by token: " + token);
             serverResponse.end(token);
         } else {

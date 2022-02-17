@@ -75,7 +75,7 @@ public class RestServerVerticleTest {
         String lastName = "Lenok";
         String jsonRequestExpected = String.format("{\"login\":\"%s\",\"firstName\":\"%s\",\"lastName\":\"%s\"}",
                 login, firstName, lastName);
-        User user = new User(new RequestAuthorization(login, firstName, lastName));
+        User user = User.of(new RequestAuthorization(login, firstName, lastName));
 
         vertx.eventBus().localConsumer(DB_REGISTER_USER.getPath(),
                 data -> data.reply(user)
@@ -85,7 +85,7 @@ public class RestServerVerticleTest {
                 .sendBuffer(Buffer.buffer(jsonRequestExpected))
                 .onComplete(answer -> {
                     answer.result().bodyAsString();
-                    context.assertEquals(user.getToken(), answer.result().bodyAsString());
+                    context.assertEquals(user.token(), answer.result().bodyAsString());
 
                     async.complete();
                 });

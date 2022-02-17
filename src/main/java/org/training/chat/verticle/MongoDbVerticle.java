@@ -212,10 +212,10 @@ public class MongoDbVerticle extends AbstractVerticle {
     }
 
     private void registerUser(Message<RequestAuthorization> data) {
-        User user = new User(data.body());
+        User user = User.of(data.body());
 
         JsonObject jsonUser = new JsonObject(Json.encode(user));
-        JsonObject query = new JsonObject().put("login", user.getLogin());
+        JsonObject query = new JsonObject().put("login", user.login());
 
         client.findOneAndReplace(TAG_USER, query, jsonUser, replaceResult -> {
             boolean isSucceeded = replaceResult.succeeded() && replaceResult.result() != null;
