@@ -56,9 +56,9 @@ public class RestServerVerticleTest {
         vertx.eventBus().localConsumer(DB_REGISTER_USER.getPath(), (Message<RequestAuthorization> requestAuthorizationData) -> {
             RequestAuthorization jsonRequestActual = requestAuthorizationData.body();
 
-            context.assertEquals(login, jsonRequestActual.getLogin());
-            context.assertEquals(firstName, jsonRequestActual.getFirstName());
-            context.assertEquals(lastName, jsonRequestActual.getLastName());
+            context.assertEquals(login, jsonRequestActual.login());
+            context.assertEquals(firstName, jsonRequestActual.firstName());
+            context.assertEquals(lastName, jsonRequestActual.lastName());
             async.complete();
         });
 

@@ -17,9 +17,9 @@ public class User {
     }
 
     public User(RequestAuthorization user) {
-        this.login = user.getLogin();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
+        this.login = user.login();
+        this.firstName = user.firstName();
+        this.lastName = user.lastName();
 
         long randomToken = new Random().nextLong();
         this.token = String.valueOf(randomToken);
