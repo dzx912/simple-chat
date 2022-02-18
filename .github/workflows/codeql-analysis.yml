@@ -2,7 +2,7 @@ name: "Static code analyzer"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ disable ]
   pull_request:
     branches: [ master ]
 
