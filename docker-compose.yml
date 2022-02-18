@@ -1,0 +1,21 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:5.0.6
+    restart: always
+    ports:
+      - 27017:27017
+
+  chat:
+    image: ghcr.io/dzx912/simple-chat:master
+    restart: always
+    ports:
+      - 8081:8081
+      - 8080:8080
+    links:
+      - mongo
+    environment:
+      db.address: mongo
+
+volumes:
+  dbdata: { }
