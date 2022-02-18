@@ -1,6 +1,5 @@
 package org.training.chat.integration.client;
 
-import com.google.common.base.Strings;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.WebSocket;
@@ -28,7 +27,7 @@ public class WSClient {
             throw new IllegalArgumentException("Vertx is null");
 
         }
-        if (Strings.isNullOrEmpty(token)) {
+        if (token == null || token.isEmpty()) {
             throw new IllegalArgumentException("Token is empty");
         }
         this.vertx = vertx;
