@@ -23,9 +23,8 @@ import static org.training.chat.constants.BusEndpoints.ROUTER_METHOD;
  */
 @RunWith(VertxUnitRunner.class)
 public class MethodRouterVerticleTest {
-    private Vertx vertx;
-
     private static final User USER = new User("id", "login", "firstName", "lastName");
+    private Vertx vertx;
 
     @Before
     public void setUp(TestContext context) {

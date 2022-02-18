@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Properties>
-        <Property name="log-pattern">%d{MM-dd-yyyy HH:mm:ss.SSS} [%style{%t}{magenta}]%highlight{%5p}{TRACE=blue, DEBUG=green, INFO=green, WARN=yellow, ERROR=red, FATAL=red} %style{%C{1}:%L}{cyan} - %m%n</Property>
+        <Property name="log-pattern">
+            %d{MM-dd-yyyy HH:mm:ss.SSS} [%style{%t}{magenta}]%highlight{%5p}{
+            TRACE=blue, DEBUG=green, INFO=green, WARN=yellow, ERROR=red, FATAL=red
+            } %style{%C{1}:%L}{cyan} - %m%n
+        </Property>
     </Properties>
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${log-pattern}" />
+            <PatternLayout pattern="${log-pattern}"/>
         </Console>
     </Appenders>
 
     <Loggers>
         <AsyncLogger name="org.training.chat" level="DEBUG" additivity="false" includeLocation="true">
-            <AppenderRef ref="Console" />
+            <AppenderRef ref="Console"/>
         </AsyncLogger>
 
         <Root level="WARN">

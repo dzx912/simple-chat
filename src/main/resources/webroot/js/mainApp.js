@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const buttonSend = document.getElementById("buttonSend");
     const inputTextMessage = document.getElementById("inputMessage");
     const outputTextMessage = document.getElementById("outputMessage");
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function init() {
         const token = chatStorage.getChatToken()
-        if(token) {
+        if (token) {
             chatClient.connect(token);
             showPanels('openChat');
         } else {
@@ -58,18 +58,18 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function showPanels(panel) {
-        registrationPanel.style.display="none";
-        openChatPanel.style.display="none";
-        chatPanel.style.display="none";
+        registrationPanel.style.display = "none";
+        openChatPanel.style.display = "none";
+        chatPanel.style.display = "none";
 
-        if(panel === 'chat') {
-            chatPanel.style.display="block";
+        if (panel === 'chat') {
+            chatPanel.style.display = "block";
         }
-        if(panel === 'openChat') {
-            openChatPanel.style.display="block";
+        if (panel === 'openChat') {
+            openChatPanel.style.display = "block";
         }
-        if(panel === 'registration') {
-            registrationPanel.style.display="block";
+        if (panel === 'registration') {
+            registrationPanel.style.display = "block";
         }
     }
 
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function sendMessage() {
         const text = inputTextMessage.value;
-        if(text) {
+        if (text) {
             chatClient.send(text)
         }
     }
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function openChat() {
         const loginReceiver = inputLoginReceiver.value;
-        if(loginReceiver) {
+        if (loginReceiver) {
             chatClient.createChat(loginReceiver);
         }
     }

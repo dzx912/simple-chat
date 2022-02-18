@@ -1,58 +1,58 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <title>Chat</title>
-        <script src="js/storage.js"></script>
-        <script src="js/chatClient.js"></script>
-        <script src="js/registration.js"></script>
-        <script src="js/mainApp.js"></script>
-    </head>
+<head>
+    <title>Chat</title>
+    <script src="js/storage.js"></script>
+    <script src="js/chatClient.js"></script>
+    <script src="js/registration.js"></script>
+    <script src="js/mainApp.js"></script>
+</head>
 
-    <body>
-        <div id="registrationPanel">
-            <h1>Registration</h1>
+<body>
+<div id="registrationPanel">
+    <h1>Registration</h1>
 
-            <label>Login:
-                <input id="inputLogin" type="text" placeholder="my login...">
-            </label>
-            <br/>
-            <label>First name:
-                <input id="inputFirstName" type="text" placeholder="firstName...">
-            </label>
-            <br/>
-            <label>Last name:
-                <input id="inputLastName" type="text" placeholder="lastName...">
-            </label>
-            <br/><br/>
-            <button id="buttonSignUp">Sign up</button>
-        </div>
+    <label>Login:
+        <input id="inputLogin" placeholder="my login..." type="text">
+    </label>
+    <br/>
+    <label>First name:
+        <input id="inputFirstName" placeholder="firstName..." type="text">
+    </label>
+    <br/>
+    <label>Last name:
+        <input id="inputLastName" placeholder="lastName..." type="text">
+    </label>
+    <br/><br/>
+    <button id="buttonSignUp">Sign up</button>
+</div>
 
-        <div id="openChatPanel">
-            <h1>Open chat</h1>
-            <button id="buttonLogout">Logout</button>
-            <br/><br/>
-            <label>Receiver's login:
-                <br/>
-                <input id="inputLoginReceiver" type="text" placeholder="receiver's login...">
-            </label>
-            <br/>
-            <button id="buttonOpenChat">Open chat</button>
-        </div>
+<div id="openChatPanel">
+    <h1>Open chat</h1>
+    <button id="buttonLogout">Logout</button>
+    <br/><br/>
+    <label>Receiver's login:
+        <br/>
+        <input id="inputLoginReceiver" placeholder="receiver's login..." type="text">
+    </label>
+    <br/>
+    <button id="buttonOpenChat">Open chat</button>
+</div>
 
-        <div id="chatPanel">
-            <h1>Chat</h1>
-            <button id="buttonCloseChat">Close chat</button>
-            <br/>
+<div id="chatPanel">
+    <h1>Chat</h1>
+    <button id="buttonCloseChat">Close chat</button>
+    <br/>
 
-            <label>Text message:
-                <br/>
-                <input id="inputMessage" type="text" placeholder="text message...">
-            </label>
-            <button id="buttonSend">Send</button>
-            <br/>
+    <label>Text message:
+        <br/>
+        <input id="inputMessage" placeholder="text message..." type="text">
+    </label>
+    <button id="buttonSend">Send</button>
+    <br/>
 
-            <h2><label for="outputMessage">Messages:</label></h2>
-            <textarea id="outputMessage" placeholder="Conversation" disabled cols="40" rows="8"></textarea>
-        </div>
-    </body>
+    <h2><label for="outputMessage">Messages:</label></h2>
+    <textarea cols="40" disabled id="outputMessage" placeholder="Conversation" rows="8"></textarea>
+</div>
+</body>
 </html>

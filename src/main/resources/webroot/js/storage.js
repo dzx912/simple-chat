@@ -5,18 +5,18 @@ function ChatStorage() {
         localStorage.removeItem("token");
     }
 
-    this.getChatToken = function() {
+    this.getChatToken = function () {
         const isAuthorization = localStorage.getItem("isAuthorization") === 'true';
-        if(isAuthorization) {
+        if (isAuthorization) {
             const localToken = localStorage.getItem("token")
-            if(localToken) {
+            if (localToken) {
                 return localToken
             }
         }
         return null;
     }
 
-    this.saveChatToken = function(token) {
+    this.saveChatToken = function (token) {
         localStorage.setItem("isAuthorization", true)
         localStorage.setItem("token", token)
     }

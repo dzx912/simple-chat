@@ -4,9 +4,9 @@ function Registration(callbackResponse) {
 
     this.signUp = function (loginValue, firstNameValue, lastNameValue) {
         const json = JSON.stringify({
-          login: loginValue,
-          firstName: firstNameValue,
-          lastName: lastNameValue
+            login: loginValue,
+            firstName: firstNameValue,
+            lastName: lastNameValue
         });
 
         httpRequest.open("POST", '/sign-up', true);
@@ -16,7 +16,7 @@ function Registration(callbackResponse) {
     }
 
     function onResponse() {
-        if(httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
+        if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
             const token = httpRequest.responseText
             console.log("Server's token: " + token);
 
@@ -26,7 +26,7 @@ function Registration(callbackResponse) {
     }
 
     function responseRegistration(token) {
-        if(callbackResponse && typeof callbackResponse === "function") {
+        if (callbackResponse && typeof callbackResponse === "function") {
             callbackResponse(token);
         }
     }

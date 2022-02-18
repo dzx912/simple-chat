@@ -21,7 +21,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     }
 
     function checkAndRun(func) {
-        if(func && typeof func === "function") {
+        if (func && typeof func === "function") {
             func();
         }
     }
@@ -43,7 +43,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     function wsGetMessage(event) {
         console.log("message: " + event.data);
 
-        if(event.data) {
+        if (event.data) {
             const json = JSON.parse(event.data);
             routerWsMessage(json);
         }
@@ -78,7 +78,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     }
 
     function showHistory(history) {
-        history.forEach(function(message) {
+        history.forEach(function (message) {
             showMessage(message);
         });
     }
@@ -107,14 +107,14 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
     this.logout = function () {
         clearToken();
 
-        if(socket) {
+        if (socket) {
             socket.close();
         }
 
         init();
     }
 
-    this.send = function(textMessage) {
+    this.send = function (textMessage) {
         const json = JSON.stringify({
             method: "sendTextMessage",
             content: {
@@ -135,7 +135,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
         outputTextMessage.value = author + message + "\n" + oldText;
     }
 
-    this.createChat = function(loginReceiver) {
+    this.createChat = function (loginReceiver) {
         const json = JSON.stringify({
             method: "createChat",
             content: {
@@ -151,7 +151,7 @@ function ChatClient(output, callbackInit, callbackClearInput, callbackShowChatPa
         showChatPanel();
     }
 
-    this.closeChat = function() {
+    this.closeChat = function () {
         chatId = null;
         clearHistory();
     }
