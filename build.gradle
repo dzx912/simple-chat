@@ -4,7 +4,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 sourceCompatibility = 17
-def versionVertx = '4.2.4'
+def versionVertx = '4.2.5'
 def versionLog4j = '2.17.1'
 def versionJackson = '2.13.1'
 def mainClass = 'org.training.chat.MainApp'
@@ -19,6 +19,7 @@ dependencies {
     implementation group: 'io.vertx', name: 'vertx-web', version: versionVertx
     implementation group: 'io.vertx', name: 'vertx-web-client', version: versionVertx
     implementation group: 'io.vertx', name: 'vertx-mongo-client', version: versionVertx
+    implementation group: 'io.vertx', name: 'vertx-config', version: versionVertx
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versionJackson
 

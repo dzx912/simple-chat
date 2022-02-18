@@ -1,5 +1,8 @@
 package org.training.chat.verticle;
 
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -34,17 +37,36 @@ public class MongoDbVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        client = MongoClient.createShared(vertx, new JsonObject()
-                .put("db_name", DB_NAME));
-        vertx.eventBus().consumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(), this::loadMessageByChat);
-        vertx.eventBus().consumer(DB_SAVE_MESSAGE.getPath(), this::saveMessage);
-        vertx.eventBus().consumer(DB_REGISTER_USER.getPath(), this::registerUser);
-        vertx.eventBus().consumer(DB_FIND_USER.getPath(), this::findUser);
-        vertx.eventBus().consumer(DB_CHAT_CREATE_BY_LOGIN.getPath(), this::createChat);
-        vertx.eventBus().consumer(DB_CHAT_FIND_BY_LOGIN.getPath(), this::findChatByLogin);
-        vertx.eventBus().consumer(DB_FIND_TOKEN_BY_USER.getPath(), this::findTokenByUser);
+        ConfigStoreOptions fileStore = new ConfigStoreOptions()
+                .setType("file")
+                .setConfig(new JsonObject().put("path", "conf/config.json"));
 
-        logger.debug("Deploy " + MongoDbVerticle.class);
+        ConfigStoreOptions env = new ConfigStoreOptions().setType("env");
+
+        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
+                .addStore(fileStore)
+                .addStore(env);
+        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
+        retriever.getConfig().onSuccess(conf -> {
+            final String dbAddress = conf.getString("db.address");
+
+            logger.info("Database address: {}", dbAddress);
+            client = MongoClient.createShared(vertx, new JsonObject()
+                    .put("db_name", DB_NAME)
+                    .put("host", dbAddress)
+            );
+            vertx.eventBus().consumer(DB_LOAD_MESSAGES_BY_CHAT.getPath(), this::loadMessageByChat);
+            vertx.eventBus().consumer(DB_SAVE_MESSAGE.getPath(), this::saveMessage);
+            vertx.eventBus().consumer(DB_REGISTER_USER.getPath(), this::registerUser);
+            vertx.eventBus().consumer(DB_FIND_USER.getPath(), this::findUser);
+            vertx.eventBus().consumer(DB_CHAT_CREATE_BY_LOGIN.getPath(), this::createChat);
+            vertx.eventBus().consumer(DB_CHAT_FIND_BY_LOGIN.getPath(), this::findChatByLogin);
+            vertx.eventBus().consumer(DB_FIND_TOKEN_BY_USER.getPath(), this::findTokenByUser);
+
+            logger.debug("Deploy " + MongoDbVerticle.class);
+        });
+
+
     }
 
     private void findTokenByUser(Message<User> data) {
